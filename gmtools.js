@@ -132,7 +132,7 @@ async function groupSavesMenu(selected_tokens, save_type, save_dc) {
                     }
                 }
             });
-            menu = menu + " {{" + tokenNamesString + "= [ROLL](!group_saves ?{Modifier?} " + tokenPairs + ")}}";
+            menu = menu + " {{" + tokenNamesString + "= [ROLL](!group_saves ?{" + save_type + "?} " + tokenPairs + ")}}";
         });
 
         //Display menu
