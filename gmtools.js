@@ -205,7 +205,7 @@ async function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
         });
 
         // For each token
-        _.each(tokenPairArray, (tokenPairObj) => {
+        _.each(tokenPairArray, async (tokenPairObj) => {
             // Get Token Object
             var tokenObj = await getObj('graphic', tokenPairObj.id);
             // Roll Save
