@@ -45,6 +45,45 @@ async function resetGMMacros(gm_id) {
     }
 }
 
+async function rollAgainstDC(DC, modifier) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Verify numbers
+            if (typeof modifier !== 'number') {
+                modifier = Number(modifier);
+            }
+            if (typeof DC !== 'number') {
+                DC = Number(DC);
+            }
+
+            // Roll
+            var d20 = randomInteger(20);
+            var total = d20 + modifier;
+
+            // Determine outcome
+            const outcomeLookup = {
+                [total >= (DC + 10)]: "Critical Success",
+                [total >= DC]: "Success",
+                [total <= (DC - 10)]: "Critical Failure",
+                default: "Failure"
+            };
+            var resultObj = {
+                roll: d20,
+                total: total,
+                outcome: ''
+            };
+            result.outcome = outcomeLookup[true] || outcomeLookup.default;
+
+            resolve(resultObj);
+
+        } catch (err) {
+            log("gmtools.js: rollAgainstDC: Error: " + err.message);
+            sendChat("gmtools.js", "rollAgainstDC: Error: " + err.message);
+            reject(err.message);
+        }
+    })
+}
+
 function groupInitiative(selected_tokens) {
     _.each(selected_tokens, async (token) => {
         try {
@@ -145,9 +184,47 @@ async function groupSavesMenu(selected_tokens, save_type, save_dc) {
     }
 }
 
-function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
+async function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
     try {
         sendChat("gmtools.js", "groupSavesRoll: Would roll Saving Throws with data: Save Type: " + saveType + ", DC: " + saveDC + ", Modifier: " + saveMod + ", Tokens: " + tokenPairs);
+
+        /* Goal: For each token, roll saving throw against DC. 
+         * Determine outcome and mark with status marker
+               Critical Success - Green 2
+               Success - Green
+               Failure - Red
+               Critical Failure - Red 2
+         * Display outcome in chat
+         * Provide button to remove the icon
+        */
+
+        // Parse the token pairs
+        var tokenPairArray = await tokenPairs.split(',').map(pair => {
+            var [name, id] = pair.trim().split(':');
+            return { name, id };
+        });
+
+        // For each token
+        _.each(tokenPairArray, (tokenPairObj) => {
+            // Get Token Object
+            var tokenObj = await getObj('graphic', tokenPairObj.id);
+            // Roll Save
+            var resultObj = await rollAgainstDC(saveDC, saveMod);
+            /* ex:
+                {
+                     roll: 20,
+                     total: 27,
+                     outcome: 'Critical Success'
+                }
+            */
+
+            // tbd
+
+
+
+
+        });
+
 
     } catch (err) {
         log("gmtools.js: groupSavesRoll: Error: " + err.message);
