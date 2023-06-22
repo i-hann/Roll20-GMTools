@@ -238,7 +238,6 @@ on('ready', function () {
     // Global variables
     var saveType = 'None';
     var saveDC = '0';
-    var selectedTokens;
 
     on('chat:message', async function (msg) {
         try {
@@ -270,11 +269,10 @@ on('ready', function () {
 
                 // 'Group-Saves' Macro with tokens selected -> Creates Menu in chat
                 if (matchesMenu) {
-                    selectedTokens = msg.selected;
                     saveType = matchesMenu[1];
                     saveDC = matchesMenu[2];
 
-                    groupSavesMenu(selectedTokens, saveType, saveDC);
+                    groupSavesMenu(msg.selected, saveType, saveDC);
                 }
 
                 // 'Roll' Menu button for specific group
