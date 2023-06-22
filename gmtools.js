@@ -72,7 +72,7 @@ async function rollAgainstDC(DC, modifier) {
                 total: total,
                 outcome: ''
             };
-            result.outcome = outcomeLookup[true] || outcomeLookup.default;
+            resultObj.outcome = outcomeLookup[true] || outcomeLookup.default;
 
             resolve(resultObj);
 
