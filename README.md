@@ -10,7 +10,7 @@ Use the !reset command in chat to create all of the macros used by this script. 
 ## Macros
 
 ### Group-Initiative (Token Action)
-Rolls Initiative for the selected token(s), displaying the results in chat and adding each token to the turn order. Requires each token to have "Bar1_Value" set to their initiative modifier.
+Rolls Initiative for the selected token(s), displaying the results in chat and adding each token to the turn order. Assumes each token to have "Bar1_Value" set to it's Initiative modifier.
 
-### Group-Saves (Token Action)
-TBD
+### Group-Saves (Token Action) (WIP)
+Rolls Saving Throws for the selected token(s). Tokens with the same image are assumed to have the same Saving Throw modifiers. On execution, the command first queries the GM for the Saving Throw type (Fortitude, Reflex, or Will) and the DC (ex: 17). Then a chat menu is displayed with a "ROLL" button for each Token Group. Pressing a ROLL button queries the GM for the Saving Throw modifier of that Token Group. Then, it... (TBD)
