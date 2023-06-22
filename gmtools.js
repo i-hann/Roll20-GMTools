@@ -74,7 +74,7 @@ function groupInitiative(selected_tokens) {
 
             //Add to turn order
             turnorder.push({
-                id: tokenId,
+                id: token._id,
                 pr: result,
                 custom: "",
                 _pageid: Campaign().get("playerpageid")
