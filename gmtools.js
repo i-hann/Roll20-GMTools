@@ -1,3 +1,4 @@
+// Function to reset GM macros used by this script to their correct values
 async function resetGMMacros(gm_id) {
     try {
         sendChat("gmtools.js", "Restoring GM Macros to Default");
@@ -45,6 +46,7 @@ async function resetGMMacros(gm_id) {
     }
 }
 
+// Function to roll a D20 against a modifier and return the Pathfinder 2 result (Crit Success, Success, Failure, Crit Failure)
 async function rollAgainstDC(DC, modifier) {
     return new Promise(async (resolve, reject) => {
         log("rollAgainstDC starting for modifier " + modifier + " vs DC " + DC);
@@ -55,6 +57,12 @@ async function rollAgainstDC(DC, modifier) {
             }
             if (typeof DC !== 'number') {
                 DC = Number(DC);
+            }
+
+            if ((typeof modifier === 'undefined') || (typeof DC === 'undefined')) {
+                sendChat("gmtools.js", `rollAgainstDC Error: 'Modifier' ${modifier} or 'DC' ${DC} is not a number`);
+                log(`rollAgainstDC Error: 'Modifier' ${modifier} or 'DC' ${DC} is not a number`);
+                reject(`rollAgainstDC Error: 'Modifier' ${modifier} or 'DC' ${DC} is not a number`);
             }
 
             // Roll
@@ -103,6 +111,99 @@ async function rollAgainstDC(DC, modifier) {
     })
 }
 
+// Function to construct an HTML table
+// includeFooter is optional in case the calling function wants to add more rows at the bottom
+async function buildHTMLTable(tableData, includeFooter) {
+    /* Example tableData obj:
+     
+     {
+        style: "width:100%; border: 1px solid purple",
+        headers: [
+            {
+                name: "vs. Fortitude 21",
+                style: "background-color:purple; color:white; padding:5px; font-size:25px",
+                align: "center",
+                colspan: "3"
+            }, ...
+        ],
+        columns: [
+            {
+                name: "Name",
+                width: "20%",
+                align: "center",
+                style: "padding:5px"
+            }, 
+            {
+                name: "Roll",
+                width: "40%",
+                align: "center",
+                style: "padding:5px"
+            }, ...
+        ], ...
+        rows: [
+                [
+                    {
+                        string: "Giant Ant",
+                        style: "padding:5px"
+                    },
+                    {
+                        string: "(15) + 7 = <b>22</b>",
+                        style: "padding:5px"
+                    },
+                    {
+                        string: "Critical Success",
+                        style: "color:green; padding:5px"
+                    },
+                ]
+            ], ...
+
+     }
+    
+
+    */
+    return new Promise((resolve, reject) => {
+        try {
+            // Build Headers
+            var table = '<table style="' + tableData.style + '"><thead>';
+            tableData.headers.forEach((header) => {
+                table = table +
+                    '<tr>' +
+                    `<td colspan="${header.colspan}" align="${header.align}" style="${header.style}">${header.name}</td>` + 
+                    '</tr>';
+            });
+
+            // Build Columns Row
+            var columnString = '';
+            tableData.columns.forEach((column) => {
+                columnString = columnString + `<th width="${column.width}" align="${column.align}" style="${column.style}">${column.name}</th>`;
+            });
+            table = table + `<tr>${columnString}</tr></thead>`;
+
+            // Build Body Rows
+            tableData.rows.forEach((row) => {
+                var rowString = '<tr>';
+                row.forEach((item) => {
+                    rowString = rowString + `<td style="${item.style}">${item.string}</td>`;
+                });
+                rowString = rowString + '</tr>';
+                table = table + rowString;
+            });
+
+            if (includeFooter === true) {
+                table = table + '</table>';
+            }
+
+            resolve(table);
+
+        } catch (err) {
+            log("buildHTMLTable: Error: " + err.message);
+            sendChat("gmtools.js", "buildHTMLTable: Error: " + err.message);
+            reject(err.message);
+        }
+    });
+}
+
+// Function to roll initiative for a group of selected tokens and add them to the turn order
 function groupInitiative(selected_tokens) {
     _.each(selected_tokens, async (token) => {
         try {
@@ -146,8 +247,8 @@ function groupInitiative(selected_tokens) {
 }
 
 /*
-Groups of tokens with the same image are assumed to have the same Saving Throw modifiers
-So we group them by their "imgsrc" value, then create a menu with a "ROLL" button for each group
+Function to display a chat menu for rolling Saving Throws for selected tokens
+Groups of tokens with the same image are assumed to have the same Saving Throw modifiers so we group them by their "imgsrc" value
 */
 async function groupSavesMenu(selected_tokens, save_type, save_dc) {
     try {
@@ -222,6 +323,7 @@ async function groupSavesMenu(selected_tokens, save_type, save_dc) {
     }
 }
 
+// Function to display the saving throw results for a group of tokens
 async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
     /* groupResults array item:
       {
@@ -237,51 +339,75 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
 
         log("displayGroupSaveResult: Starting for groupResults of length " + groupResults.length);
 
-        // Table Header
-        const table_header = '<table style="width:100%; border: 1px solid purple" >' +
-            '<thead>' +
-            '<tr>' +
-            '<td colspan="3" align="center" style="background-color:purple; color:white; padding:5px; font-size:25px">vs. ' + saveType + ' ' + saveDC + '</td>' +
-            '</tr>' +
-            '<tr>' +
-            '<th width="40%" align="center" style="padding:5px">Name</th><th width="40%" align="center">Roll</th><th width="20%" align="center">Result</th>' +
-            '</tr>' +
-            '</thead>';
+        // Table data
+        var tableData = {
+            style: "width:100%; border: 1px solid purple",
+            headers: [
+                {
+                    name: `vs. ${saveType} ${saveDC}`,
+                    style: "background-color:purple; color:white; padding:5px; font-size:25px",
+                    align: "center",
+                    colspan: "3"
+                }
+            ],
+            columns: [
+                {
+                    name: "Name",
+                    width: "30%",
+                    align: "center",
+                    style: "padding:5px"
+                },
+                {
+                    name: "Roll",
+                    width: "50%",
+                    align: "center",
+                    style: "padding:5px"
+                },
+                {
+                    name: "Outcome",
+                    width: "20%",
+                    align: "center",
+                    style: "padding:5px"
+                }
+            ],
+            rows: []
+        };
 
-        // Table Foot
-        const table_foot = '</table>';
-
-        // Table Body
-        var table_body = '';
+        // Build rows
         groupResults.forEach((result) => {
-            // Build roll string
-            var rollString = '(' + result.roll + ') + ' + saveMod + ' = <b>' + result.total + '</b>';
+            var row = [];
+            // Ex:  Giant Ant    (17) + 4 = **21**     Success
+            // Name
+            row.push({
+                string: result.name,
+                style: "padding:5px"
+            });
 
-            // Build outcome string
-            var outcomeString;
-            var outcomeColor;
-            var outcomeBold = false;
+            // Roll
+            row.push({
+                string: `(${result.roll}) + ${saveMod} = <b>${result.total}</b>`,
+                style: "padding:5px"
+            });
+
+            // Outcome
+            var outcomeString = result.outcome;
+            var outcomeColor = "black";
             if ((result.outcome === "Critical Success") || (result.outcome === "Success")) { outcomeColor = "green" }
             if ((result.outcome === "Critical Failure") || (result.outcome === "Failure")) { outcomeColor = "red" }
-            if ((result.outcome === "Critical Failure") || (result.outcome === "Critical Success")) { outcomeBold = true }
-            if (outcomeBold === false) {
-                outcomeString = '<td style="color:' + outcomeColor + '">' + result.outcome + '</td>';
-            } else {
-                outcomeString = '<td style="color:' + outcomeColor + '"><b>' + result.outcome + '</b></td>';
+            if ((result.outcome === "Critical Failure") || (result.outcome === "Critical Success")) {
+                outcomeString = `<b>${outcomeString}</b>`;
             }
+            row.push({
+                string: outcomeString,
+                style: `color:${outcomeColor}; padding:5px`
+            });
 
-            table_body = table_body +
-                '<tr>' +
-                '<td style="padding:5px">' + result.name + '</td>' +
-                '<td>' + rollString + '</td>' +
-                outcomeString +
-                '</tr>';
-
-            log("displayGroupSaveResult: Populating row: " + '<tr><td>' + result.name + '</td><td>' + rollString + '</td>' + outcomeString + '</tr>');
+            // Push to tableData
+            tableData.rows.push(row);
         });
 
-        // Build the table
-        const table = table_header + table_body + table_foot;
+        // Build Table
+        var table = await buildHTMLTable(tableData, true);
 
         // Display to chat
         sendChat("gmtools.js", table);
