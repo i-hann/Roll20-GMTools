@@ -323,7 +323,7 @@ async function groupSavesMenu(selected_tokens, save_type, save_dc) {
     }
 }
 
-// Function to display the saving throw results for a group of tokens
+// Function to display the saving throw results for a group of tokens, and tag each token based on the result
 async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
     /* groupResults array item:
       {
@@ -345,7 +345,7 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
             headers: [
                 {
                     name: `vs. ${saveType} ${saveDC}`,
-                    style: "background-color:purple; color:white; padding:5px; font-size:25px",
+                    style: "background-color:purple; color:white; padding:8px; font-size:25px",
                     align: "center",
                     colspan: "3"
                 }
@@ -406,8 +406,48 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
             tableData.rows.push(row);
         });
 
-        // Build Table
-        var table = await buildHTMLTable(tableData, true);
+        // Build open-ended table
+        var table = await buildHTMLTable(tableData, false);
+
+        //Tag the tokens
+        var taggedTokenIdsString = '';
+        var firstEntry = true;
+        const promises = groupResults.map(async (result) => {
+            if (firstEntry === true) {
+                taggedTokenIdsString = result.id;
+                firstEntry = false;
+            }
+            else {
+                taggedTokenIdsString = taggedTokenIdsString + "," + result.id;
+            }
+            var status_marker = "";
+            var count = "";
+            var tokenObj = await getObj('graphic', result.id);
+            switch (result.outcome) {
+                case "Critical Success":
+                    status_marker = "status_green";
+                    count = "2";
+                    break;
+                case "Success":
+                    status_marker = "status_green";
+                    count = "1";
+                    break;
+                case "Failure":
+                    status_marker = "status_red";
+                    count = "1";
+                    break;
+                case "Critical Failure":
+                    status_marker = "status_red";
+                    count = "2";
+                    break;
+            }
+            tokenObj.set(status_marker, count);
+        });
+        await Promise.all(promises);
+
+        // Add "Remove Tags" button to bottom of the table
+        table = table + `<tr><td colspan="3" style="padding:10px; font-size:20px" align="center">[Remove Tags](!group_saves remove ${taggedTokenIdsString})</td></tr>` +
+            '</table>';
 
         // Display to chat
         sendChat("gmtools.js", table);
@@ -475,6 +515,22 @@ async function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
     }
 }
 
+// Function to remove Red and Green status markers
+async function groupSavesRemoveTags(tokenIdsString) {
+    // tokenIdsString is a comma separated list of ids
+    try {
+        var tokenIds = tokenIdsString.split(",");
+        tokenIds.forEach(async (tokenId) => {
+            var tokenObj = await getObj('graphic', tokenId);
+            tokenObj.set("status_red", false);
+            tokenObj.set("status_green", false);
+        });
+    } catch (err) {
+        log("groupSavesRemoveTags: Error: " + err.message);
+        sendChat("gmtools.js", "groupSavesRemoveTags: Error: " + err.message);
+    }
+}
+
 on('ready', function () {
     "use strict";
 
@@ -509,8 +565,10 @@ on('ready', function () {
                 // Match msg to command type and parameters
                 var menuRegexp = /^!group_saves\s(Fortitude|Reflex|Will)\s*([0-9]+)$/i;  // ex: !group_saves Fortitude 21
                 var rollRegexp = /^!group_saves\s(\-*[0-9]+)\s*(.*)$/i;  // ex: !group_saves 7 Giant Ant:-NYZRX_VYs0snPtuZmm1
+                var removeTagsRegexp = /^!group_saves\sremove\s(.*)$/i; // ex: !group_saves remove -NYZRX_VYs0snPtuZmm1
                 var matchesMenu = msg.content.match(menuRegexp);
                 var matchesRoll = msg.content.match(rollRegexp);
+                var matchesRemoveTags = msg.content.match(removeTagsRegexp);
 
                 // 'Group-Saves' Macro with tokens selected -> Create Menu in chat
                 if ((matchesMenu) && (typeof msg.selected !== 'undefined')) {
@@ -525,6 +583,12 @@ on('ready', function () {
                     var saveMod = matchesRoll[1];
                     var tokenPairs = matchesRoll[2];
                     groupSavesRoll(tokenPairs, saveMod, saveType, saveDC);
+                }
+
+                // Menu "Remove Tags" button is pressed for a group
+                else if (matchesRemoveTags) {
+                    var tokenIds = matchesRemoveTags[1];
+                    groupSavesRemoveTags(tokenIds);
                 }
 
             }
