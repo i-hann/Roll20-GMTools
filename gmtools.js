@@ -554,8 +554,7 @@ on('ready', function () {
 
             // Group Initiative (GM Only)
             if ((msg.content.match(/^!group_initiative/i)) && (typeof msg.selected != 'undefined') && (playerIsGM(msg.playerid))) {
-                selectedTokens = msg.selected;
-                groupInitiative(selectedTokens);
+                groupInitiative(msg.selected);
             }
 
 
