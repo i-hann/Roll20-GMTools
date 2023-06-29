@@ -6,6 +6,13 @@ async function resetGMMacros(gm_id) {
         // Define GM Macros
         const gm_macros = [
             {
+                name: "Debug",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!debug',
+                istokenaction: true
+            },
+            {
                 name: "Group-Initiative",
                 _playerid: gm_id,
                 visibleto: gm_id,
@@ -18,7 +25,15 @@ async function resetGMMacros(gm_id) {
                 visibleto: gm_id,
                 action: '!group_saves ?{Type?|Fortitude,Fortitude|Reflex,Reflex|Will,Will} ?{DC?}',
                 istokenaction: true
-            }
+            },
+            {
+                name: "Refresh-Sfx",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!refresh deathsfx',
+                istokenaction: false
+            },
+
         ];
 
         // Find existing macros
@@ -43,6 +58,39 @@ async function resetGMMacros(gm_id) {
 
     } catch (err) {
         sendChat("gmtools.js", "gmtools.js: resetGMMacros: Error: " + err.message);
+        log("gmtools.js: resetGMMacros: Error: " + err.message);
+    }
+}
+
+// Function to display attributes of a 'Graphic' object
+async function debugGraphic(selectedObj) {
+    try {
+        const id = selectedObj._id;
+        const graphicObj = await getObj('graphic', id);
+        const name = await graphicObj.get('name');
+        const type = await graphicObj.get('_type');
+        const subtype = await graphicObj.get('_subtype');
+        const pageid = await graphicObj.get('_pageid');
+        const controlledby = await graphicObj.get('controlledby');
+        const tint_color = await graphicObj.get('tint_color');
+        sendChat("gmtools.js", `&{template:default}{{name=${name}}}{{id=${id}}}{{type=${type}}}{{subtype=${subtype}}}{{pageid=${pageid}}}{{controlledby=${controlledby}}}{{tint_color=${tint_color}}}`);
+
+    } catch (err) {
+        sendChat("gmtools.js", "gmtools.js: debugGraphic: Error: " + err.message);
+        log("gmtools.js: debugGraphic: Error: " + err.message);
+    }
+}
+
+// Function to handle !debug command
+async function handleDebug(selectedObj) {
+    try {
+        if (selectedObj._type === 'graphic') {
+            debugGraphic(selectedObj);
+        }
+
+    } catch (err) {
+        sendChat("gmtools.js", "gmtools.js: handleDebug: Error: " + err.message);
+        log("gmtools.js: handleDebug: Error: " + err.message);
     }
 }
 
@@ -203,6 +251,101 @@ async function buildHTMLTable(tableData, includeFooter) {
     });
 }
 
+// Function to populate the DeathSfx Playlist from the Roll20 Jukebox
+async function loadDeathSfxPlaylist() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Get all Sfx
+            const allSfx = await findObjs({
+                _type: "jukeboxtrack"
+            });
+
+            // Populate "Death:... " sfx into array
+            var deathSfxPlaylist = [];
+            const promises = allSfx.map(async (obj) => {
+                const title = await obj.get("title");
+                if (/^Death:.*/i.test(title)) { deathSfxPlaylist.push(obj); }
+            });
+            await Promise.all(promises);
+
+            // Resolve
+            if (deathSfxPlaylist.length > 0) {
+                resolve(deathSfxPlaylist);
+            } else {
+                reject("deathSfxPlaylist resolved as empty");
+            }
+
+        } catch (err) {
+            log("gmtools.js: loadDeathSfx: Error: " + err.message);
+            reject(err.message);
+        }
+    })
+}
+
+// Function to play a random Death Sfx
+async function playRandomDeathSfx(deathSfxPlaylist) {
+    try {
+        // Get random obj from playlist
+        const randomIndex = await randomInteger(deathSfxPlaylist.length - 1);
+        const jukeboxObj = deathSfxPlaylist[randomIndex];
+
+        // Play it
+        jukeboxObj.set("playing", false);
+        jukeboxObj.set("softstop", false);
+        jukeboxObj.set("playing", true);
+
+    } catch (err) {
+        log("gmtools.js: Error in playDeathSfx: " + err.message);
+        sendChat("gmtools.js", "Error in playDeathSfx: " + err.message);
+    }
+}
+
+// Function to verify if a change to a token merits DeathSfx, then play DeathSfx and mark the Token's GM notes with "[status:dead]"
+async function handleDeathSfx(token, deathSfxPlaylist) {
+    try {
+
+        // Get Token Object
+        const id = await token.get('_id');
+        const tokenObj = await getObj('graphic', id);
+
+        // Validate that Current and Max HP are populated
+        const bar3_max = await tokenObj.get("bar3_max");
+        const bar3_value = await tokenObj.get("bar3_value");
+        if ((!(/^\-*[0-9]+$/i.test(bar3_max))) || (!(/^\-*[0-9]+$/i.test(bar3_value)))) { return; }
+
+        // Is Token supposed to be dead?
+        const hp_value = Number(bar3_value);
+        var gm_notes = await tokenObj.get("gmnotes");
+
+        if (hp_value <= 0) {
+            // Yes - Token is supposed to be dead
+            // Have we marked it as dead already?
+            if (/\[status:dead\]/i.test(gm_notes)) {
+                // Yes - do nothing
+                return;
+            } else {
+                // No - Mark as dead and play sfx
+                tokenObj.set("gmnotes", gm_notes + "[status:dead]");
+                playRandomDeathSfx(deathSfxPlaylist);
+            }
+        } else {
+            // No
+            // Was it previously dead?
+            if (/\[status:dead\]/i.test(gm_notes)) {
+                // Yes - remove status
+                gm_notes = gm_notes.replace("[status:dead]", "");
+                tokenObj.set("gmnotes", gm_notes);
+            } else {
+                // No - do nothing
+                return;
+            }
+        }
+    } catch (err) {
+        log("gmtools.js: Error in handleDeathSfx: " + err.message);
+        sendChat("gmtools.js", "Error in handleDeathSfx: " + err.message);
+    }
+}
+
 // Function to roll initiative for a group of selected tokens and add them to the turn order
 function groupInitiative(selected_tokens) {
     _.each(selected_tokens, async (token) => {
@@ -210,8 +353,13 @@ function groupInitiative(selected_tokens) {
             // Get token object
             var tokenObj = await getObj('graphic', token._id);
 
-            // Get initiative modifier
+            // Get Bar1 value
             var bar1 = await tokenObj.get('bar1_value');
+
+            // Validate Bar1
+            if (!(/^\-*[0-9]+$/i.test(bar1))) { return; }
+
+            // Save as Initiative Modifier
             var initMod = Number(bar1);
 
             // Get character name
@@ -310,7 +458,7 @@ async function groupSavesMenu(selected_tokens, save_type, save_dc) {
                     }
                 }
             });
-            menu = menu + " {{" + tokenNamesString + "= [ROLL](!group_saves ?{" + save_type + "?} " + tokenPairs + ")}}";
+            menu = menu + " {{" + tokenNamesString + "= [ROLL](!group_saves ?{" + save_type + "?} " + save_type + ":" + save_dc + " " + tokenPairs + ")}}";
         });
 
         //Display menu
@@ -460,18 +608,10 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
 
 }
 
+// Function to roll saving throws for a group from the Group Saves menu
 async function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
     try {
         log("groupSavesRoll starting vs " + saveType + " " + saveDC + " for group: " + tokenPairs.slice(0, 20) + " ...");
-        /* Goal: For each token, roll saving throw against DC. 
-         * Determine outcome and mark with status marker
-               Critical Success - Green 2
-               Success - Green
-               Failure - Red
-               Critical Failure - Red 2
-         * Display outcome in chat
-         * Provide button to remove the icon
-        */
 
         // Parse the token pairs
         var tokenPairArray = await tokenPairs.split(',').map(pair => {
@@ -485,15 +625,8 @@ async function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
         const promises = tokenPairArray.map(async (tokenPair) => {
             // Roll Save
             var resultObj = await rollAgainstDC(saveDC, saveMod);
-            /* ex:
-                {
-                     roll: 20,
-                     total: 27,
-                     outcome_string: 'Critical Success',
-                     outcome_numeric: 4
-                }
-            */
 
+            // Populate results
             groupResults.push({
                 id: tokenPair.id,
                 name: tokenPair.name,
@@ -506,6 +639,8 @@ async function groupSavesRoll(tokenPairs, saveMod, saveType, saveDC) {
         });
 
         await Promise.all(promises);
+
+        //Display results
         displayGroupSaveResult(groupResults, saveMod, saveType, saveDC);
 
 
@@ -531,15 +666,21 @@ async function groupSavesRemoveTags(tokenIdsString) {
     }
 }
 
-on('ready', function () {
+on('ready', async function () {
     "use strict";
 
-    // Global variables
-    var saveType = 'None';
-    var saveDC = '0';
+    // Load DeathSfx Playlist
+    var deathSfxPlaylist = await loadDeathSfxPlaylist();
+    if ((typeof deathSfxPlaylist != 'undefined') && (deathSfxPlaylist.length > 0)) {
+        log("gmtools.js: Loaded DeathSfxPlaylist.");
+    } else {
+        log("gmtools.js: Failed to load DeathSfxPlaylist.");
+    }
 
+    // Ready Msg
     log("gmtools.js: Ready!");
 
+    // Chat Event Listener
     on('chat:message', async function (msg) {
         try {
             // Ignore non-API messages
@@ -550,6 +691,16 @@ on('ready', function () {
             // Reset GM Macros (GM Only)
             if ((msg.content.match(/^!reset/i)) && (playerIsGM(msg.playerid))) {
                 resetGMMacros(msg.playerid);
+            }
+
+            // Debug (GM Only)
+            if ((msg.content.match(/^!debug/i)) && (typeof msg.selected != 'undefined') && ((msg.selected).length === 1) && (playerIsGM(msg.playerid))) {
+                handleDebug(msg.selected[0]);
+            }
+
+            // Refresh Death Sfx Playlist (GM Only)
+            if ((msg.content.match(/^!refresh deathsfx$/i)) && (playerIsGM(msg.playerid))) {
+                deathSfxPlaylist = await loadDeathSfxPlaylist();
             }
 
             // Group Initiative (GM Only)
@@ -563,7 +714,7 @@ on('ready', function () {
 
                 // Match msg to command type and parameters
                 var menuRegexp = /^!group_saves\s(Fortitude|Reflex|Will)\s*([0-9]+)$/i;  // ex: !group_saves Fortitude 21
-                var rollRegexp = /^!group_saves\s(\-*[0-9]+)\s*(.*)$/i;  // ex: !group_saves 7 Giant Ant:-NYZRX_VYs0snPtuZmm1
+                var rollRegexp = /^!group_saves\s(\-*[0-9]+)\s*(Fortitude|Reflex|Will)\:([0-9]+)\s*(.*)$/i;  // ex: !group_saves 7 Fortitude:21 Giant Ant:-NYZRX_VYs0snPtuZmm1
                 var removeTagsRegexp = /^!group_saves\sremove\s(.*)$/i; // ex: !group_saves remove -NYZRX_VYs0snPtuZmm1
                 var matchesMenu = msg.content.match(menuRegexp);
                 var matchesRoll = msg.content.match(rollRegexp);
@@ -571,16 +722,18 @@ on('ready', function () {
 
                 // 'Group-Saves' Macro with tokens selected -> Create Menu in chat
                 if ((matchesMenu) && (typeof msg.selected !== 'undefined')) {
-                    saveType = matchesMenu[1];
-                    saveDC = matchesMenu[2];
-
+                    var saveType = matchesMenu[1];
+                    var saveDC = matchesMenu[2];
                     groupSavesMenu(msg.selected, saveType, saveDC);
                 }
 
                 // Menu 'ROLL' button is pressed for a group
+                // ex: !group_saves 7 Fortitude:21 Giant Ant:-NYZRX_VYs0snPtuZmm1
                 else if (matchesRoll) {
-                    var saveMod = matchesRoll[1];
-                    var tokenPairs = matchesRoll[2];
+                    var saveMod = matchesRoll[1];  // 7
+                    var saveType = matchesRoll[2]; // Fortitude
+                    var saveDC = matchesRoll[3]; // 21
+                    var tokenPairs = matchesRoll[4]; // Giant Ant:-NYZRX_VYs0snPtuZmm1
                     groupSavesRoll(tokenPairs, saveMod, saveType, saveDC);
                 }
 
@@ -598,4 +751,19 @@ on('ready', function () {
             sendChat("gmtools.js", "Error: " + err.message);
         }
     });
+
+    // HP Event Listener
+    on('change:graphic:bar3_value', (obj) => {
+        try {
+            // Death Sfx
+            handleDeathSfx(obj, deathSfxPlaylist);
+
+        } catch (err) {
+            log("gmtools.js: Error in main: HP Event Listener: " + err.message);
+            sendChat("gmtools.js", "Error in main: HP Event Listener: " + err.message)
+        }
+
+    });
+
+
 });
