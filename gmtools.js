@@ -317,7 +317,7 @@ async function loadDeathSfxPlaylist() {
             if (deathSfxPlaylist.length > 0) {
                 resolve(deathSfxPlaylist);
             } else {
-                reject("deathSfxPlaylist resolved as empty");
+                reject("DeathSfxPlaylist resolved as empty.");
             }
 
         } catch (err) {
@@ -715,12 +715,9 @@ on('ready', async function () {
     "use strict";
 
     // Load DeathSfx Playlist
-    var deathSfxPlaylist = await loadDeathSfxPlaylist();
-    if ((typeof deathSfxPlaylist != 'undefined') && (deathSfxPlaylist.length > 0)) {
-        log("gmtools.js: Loaded DeathSfxPlaylist.");
-    } else {
+    var deathSfxPlaylist = await loadDeathSfxPlaylist().catch((err) => {
         log("gmtools.js: Failed to load DeathSfxPlaylist.");
-    }
+    });
 
     // Ready Msg
     log("gmtools.js: Ready!");
