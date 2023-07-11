@@ -393,6 +393,37 @@ async function handleDeath(token, deathSfxPlaylist) {
     }
 }
 
+async function handleHpTint(token, hpTints) {
+    try {
+        // Get Token Object
+        const id = await token.get('_id');
+        const tokenObj = await getObj('graphic', id);
+
+        // Validate that Current and Max HP are populated
+        const bar3_max = await tokenObj.get("bar3_max");
+        const bar3_value = await tokenObj.get("bar3_value");
+        if ((!(/^\-*[0-9]+$/i.test(bar3_max))) || (!(/^\-*[0-9]+$/i.test(bar3_value)))) { return; }
+
+        // Calc HP % rounded up
+        var percentage = (bar3_value / bar3_max) * 100;
+        var percentageRounded = Math.ceil(percentage);
+        if ((percentageRounded >= 50) || (percentageRounded <= 0)) {
+            // 50%+, or dead - Remove tint
+            tokenObj.set("tint_color", "transparent");
+        } else {
+            // 1% - 49% - Add tint
+            var hexIndex = Math.floor(percentageRounded / 2);
+            tokenObj.set("tint_color", hpTints[hexIndex]);
+        }
+
+
+    } catch (err) {
+        log("gmtools.js: Error in handleHpTint: " + err.message);
+        sendChat("gmtools.js", "Error in handleHpTint: " + err.message);
+    }
+
+}
+
 // Function to roll initiative for a group of selected tokens and add them to the turn order
 function groupInitiative(selected_tokens) {
     _.each(selected_tokens, async (token) => {
@@ -716,6 +747,16 @@ async function groupSavesRemoveTags(tokenIdsString) {
 on('ready', async function () {
     "use strict";
 
+    // 25 HP Tint colors which each corresponds to a 2% window (ex: 1-2%, 3-4%, etc.)
+    // red -> orange -> yellow
+    const hpTints = [
+        "#850101", "#8d1201", "#951f00", "#9d2900", "#a53400",
+        "#ac3d00", "#b34700", "#ba5100", "#c15a00", "#c76400", 
+        "#cd6d00", "#d37700", "#d98100", "#de8b00", "#e39500", 
+        "#e79f00", "#ecaa00", "#efb400", "#f3be00", "#f6c900",  
+        "#f9d400", "#fbde00", "#fde900", "#fef400", "#ffff04"
+    ]
+
     // Load DeathSfx Playlist
     var deathSfxPlaylist = await loadDeathSfxPlaylist().catch((err) => {
         log("gmtools.js: Failed to load DeathSfxPlaylist.");
@@ -727,6 +768,7 @@ on('ready', async function () {
     // Chat Event Listener
     on('chat:message', async function (msg) {
         try {
+
             // Ignore non-API messages
             if (msg.type != 'api') {
                 return;
@@ -804,8 +846,12 @@ on('ready', async function () {
     // HP Event Listener
     on('change:graphic:bar3_value', (obj) => {
         try {
+
             // Death
             handleDeath(obj, deathSfxPlaylist);
+
+            // HP Tint
+            handleHpTint(obj, hpTints);
 
         } catch (err) {
             log("gmtools.js: Error in main: HP Event Listener: " + err.message);
