@@ -345,8 +345,8 @@ async function playRandomDeathSfx(deathSfxPlaylist) {
     }
 }
 
-// Function to verify if a change to a token merits DeathSfx, then play DeathSfx and mark the Token's GM notes with "[status:dead]"
-async function handleDeathSfx(token, deathSfxPlaylist) {
+// Function to verify if a change to a token has died, then play DeathSfx and mark the token as dead
+async function handleDeath(token, deathSfxPlaylist) {
     try {
 
         // Get Token Object
@@ -371,17 +371,19 @@ async function handleDeathSfx(token, deathSfxPlaylist) {
             } else {
                 // No - Mark as dead and play sfx
                 tokenObj.set("gmnotes", gm_notes + "[status:dead]");
+                tokenObj.set("status_dead", true);
                 playRandomDeathSfx(deathSfxPlaylist);
             }
         } else {
-            // No
+            // No it's not supposed to be dead
             // Was it previously dead?
             if (/\[status:dead\]/i.test(gm_notes)) {
                 // Yes - remove status
                 gm_notes = gm_notes.replace("[status:dead]", "");
                 tokenObj.set("gmnotes", gm_notes);
+                tokenObj.set("status_dead", false);
             } else {
-                // No - do nothing
+                // No it wasn't previously dead - do nothing
                 return;
             }
         }
@@ -802,8 +804,8 @@ on('ready', async function () {
     // HP Event Listener
     on('change:graphic:bar3_value', (obj) => {
         try {
-            // Death Sfx
-            handleDeathSfx(obj, deathSfxPlaylist);
+            // Death
+            handleDeath(obj, deathSfxPlaylist);
 
         } catch (err) {
             log("gmtools.js: Error in main: HP Event Listener: " + err.message);
