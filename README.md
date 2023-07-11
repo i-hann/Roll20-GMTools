@@ -18,6 +18,9 @@ Rolls Initiative for the selected token(s), displaying the results in chat and a
 ### Group-Saves (Macro - Token Action)
 Rolls Saving Throws for the selected token(s). Tokens with the same image are assumed to have the same Saving Throw modifiers. On execution, the command first queries the GM for the Saving Throw type (Fortitude, Reflex, or Will) and the DC (ex: 17). Then a chat menu is displayed with a "ROLL" button for each Token Group. Pressing a ROLL button queries the GM for the Saving Throw modifier of that Token Group. Then, it rolls all of the saves for the group and displays them in a new table with custom HTML.
 
+### Cycle (Macro - Token Action)
+After creating a Rollable Table in Roll20 with multiple images for a token, the Cycle button will increment the token's image by one table item each time (i.e. 1 -> 2 -> 3 -> 1)
+
 ### Death Sound Effects
 Treating Bar 3 as HP, any token that drops to 0 HP or lower will trigger a Death sound effect from the Roll20 Jukebox. In order for a Jukebox item to be used as a Death sound effect, it's title needs to begin with "Death:" (ex: "Death: Wilhelm Scream").
 

@@ -33,6 +33,13 @@ async function resetGMMacros(gm_id) {
                 action: '!refresh deathsfx',
                 istokenaction: false
             },
+            {
+                name: "Cycle",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!cycle token',
+                istokenaction: true
+            }
 
         ];
 
@@ -91,6 +98,44 @@ async function handleDebug(selectedObj) {
     } catch (err) {
         sendChat("gmtools.js", "gmtools.js: handleDebug: Error: " + err.message);
         log("gmtools.js: handleDebug: Error: " + err.message);
+    }
+}
+
+// Function to cycle one or more selected rollable table tokens
+function cycleToken(selectedTokens) {
+    try {
+        _.each(selectedTokens, async (selectedToken) => {
+            const tokenObj = await getObj('graphic', selectedToken._id);
+            const sides = await tokenObj.get('sides');
+            const sidesArray = sides.split("|");  // [0]Side1  [1]Side2
+            const lastSideIndex = sidesArray.length - 1;  // 1
+
+            // Only 1 side means not a rollable token
+            if (lastSideIndex == 0) { return; }
+
+            // Find next side and imgsrc in cycle
+            const currentSideIndex = await tokenObj.get('currentSide'); // 0
+            var nextSideIndex;
+            if (currentSideIndex < lastSideIndex) {
+                nextSideIndex = currentSideIndex + 1;
+            } else {
+                nextSideIndex = 0;
+            }
+            var nextImgSrc = sidesArray[nextSideIndex];
+            
+            // Clean up imgsrc so it can be passed back to Roll20
+            var cleanNextImgSrc = await decodeURIComponent(nextImgSrc);
+            cleanNextImgSrc = await cleanNextImgSrc.replace(/\/[a-z]*\.png/i, "\/thumb.png");
+
+            await tokenObj.set({
+                currentSide: nextSideIndex,
+                imgsrc: cleanNextImgSrc
+            });
+        });
+
+    } catch (err) {
+        sendChat("gmtools.js", "gmtools.js: flipToken: Error: " + err.message);
+        log("gmtools.js: flipToken: Error: " + err.message);
     }
 }
 
@@ -743,6 +788,11 @@ on('ready', async function () {
                     groupSavesRemoveTags(tokenIds);
                 }
 
+            }
+
+            // Cycle Token (GM Only)
+            if ((msg.content.match(/^!cycle token/i)) && (typeof msg.selected != 'undefined') && (playerIsGM(msg.playerid))) {
+                cycleToken(msg.selected);
             }
 
 
