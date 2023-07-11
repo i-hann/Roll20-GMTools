@@ -24,3 +24,5 @@ After creating a Rollable Table in Roll20 with multiple images for a token, the 
 ### Death Sound Effects
 Treating Bar 3 as HP, any token that drops to 0 HP or lower will trigger a Death sound effect from the Roll20 Jukebox. In order for a Jukebox item to be used as a Death sound effect, it's title needs to begin with "Death:" (ex: "Death: Wilhelm Scream").
 
+### HP Tinting
+Treating Bar 3 as HP, any token that drops below 50% HP will be tinted on a gradient of yellow -> orange -> red until they hit 0.
