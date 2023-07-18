@@ -1,3 +1,204 @@
+// Conditions
+const conditions = {
+    "Rules": "Conditions of the same name and value don't stack - the duration becomes the longer of the two. Conditions with different values are considered different conditions. If you’re affected by a condition with a value multiple times, you apply only the highest value, although you might have to track both durations if one has a lower value but lasts longer.",
+    "Blinded": {
+        "Name": "Blinded",
+        "Description": "Can't see. All terrain is difficult. Immune to visual effects. Overrides Dazzled.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042735:blinded"
+    },
+    "Clumsy": {
+        "Name": "Clumsy",
+        "Description": "-[value] to DEX checks and DCs (AC, Reflex, Ranged attack rolls, skills, etc.)",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042737:clumsy"
+    },
+    "Concealed": {
+        "Name": "Concealed",
+        "Description": "Requires DC 5 flat check to be targeted with attack, spell, or other effect.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042738:concealed"
+    },
+    "Confused": {
+        "Name": "Confused",
+        "Description": "Flat-footed, can't benefit from flanking, can't Delay or Ready, can't use Reactions. All actions must be spent on Strikes or offensive Cantrips against a random target determined by the GM. If there are no targets, you target yourself, automatically hitting. Each time you take damage, you get a flat DC 11 check to overcome the confusion.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042739:confused"
+    },
+    "Dazzled": {
+        "Name": "Dazzled",
+        "Description": "If vision is only precise sense, all creatures and objects are Concealed (DC 5 flat check to target).",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042741:dazzled"
+    },
+    "Deafened": {
+        "Name": "Deafened",
+        "Description": "Can't hear. -2 Perception for Initiative. Actions with 'Auditory' trait require DC 5 flat check. Immune to auditory effects.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042742:deafened"
+    },
+    "Doomed": {
+        "Name": "Doomed",
+        "Description": "Dying needed to die decreased by [value] (a creature with Doomed 2 would die at Dying 2 instead of Dying 4). Doomed value decreases by 1 with each rest.",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042743:doomed"
+    },
+    "Drained": {
+        "Name": "Drained",
+        "Description": "-[value] to CON checks (such as Fortitude). Lose current and max HP equal to level times [value]. Doesn't count as taking damage. Drained value decreases by 1 with each rest.",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042744:drained"
+    },
+    "Encumbered": {
+        "Name": "Encumbered",
+        "Description": "Clumsy 1 (-1 to DEX checks and DCs such as AC, Reflex, Ranged attack rolls, skills, etc). 10-foot penalty to all Speeds. Can't reduce Speed below 5.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042746:encumbered"
+    },
+    "Enfeebled": {
+        "Name": "Enfeebled",
+        "Description": "-[value] to STR checks and DCs (such as melee attacks, damage, Athletics).",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042747:enfeebled"
+    },
+    "Fascinated": {
+        "Name": "Fascinated",
+        "Description": "-2 Perception and skill checks. Can't use 'concentrate' actions unless they are related to the subject of the fascination. This condition ends if any creature uses hostile actions against you or any of your allies.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042748:fascinated"
+    },
+    "Fatigued": {
+        "Name": "Fatigued",
+        "Description": "-1 to AC and saves. Can't use exploration activities while traveling. Recover with one rest.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042750:fatigued"
+    },
+    "Fleeing": {
+        "Name": "Fleeing",
+        "Description": "All actions must be spent escaping the source (usually the caster) of the condition. Can't Delay or Ready.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042755:fleeing"
+    },
+    "Frightened": {
+        "Name": "Frightened",
+        "Description": "-[value] to all checks and DCs. Unless otherwise specified, Frightened value decreases by 1 at end of each of your turns.",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042757:frightened"
+    },
+    "Grabbed": {
+        "Name": "Grabbed",
+        "Description": "Flat-footed and immobilized (can't use actions with 'Move' trait). Actions with 'Manipulate' trait require DC 5 flat check.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042760:grabbed"
+    },
+    "Immobilized": {
+        "Name": "Immobilized",
+        "Description": "Can't use actions with 'Move' trait. If something would force you to move, the force must succeed against the DC of the immobilizing source (spell DC or Athletics DC)",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042764:immobilised"
+    },
+    "Invisible": {
+        "Name": "Invisible",
+        "Description": "Creatures can't target you and have no idea what space you occupy. Creatures can use Seek action against your Stealth DC to identify what space you're in (allowing a DC 11 flat check to target you).",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042767:invisible"
+    },
+    "Paralyzed": {
+        "Name": "Paralyzed",
+        "Description": "Flat-footed. Can't act except to Recall Knowledge or other actions that require only the use of your mind (as determined by GM).",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042769:paralysed"
+    },
+    "Persistent": {
+        "Name": "Persistent",
+        "Description": "Take [value] [type] damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "hasType": true,
+        "statusMarker": "yellow"
+    },
+    "Petrified": {
+        "Name": "Petrified",
+        "Description": "Can't act or sense anything. Has AC 9, Hardness 8.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042771:petrified"
+    },
+    "Prone": {
+        "Name": "Prone",
+        "Description": "Flat-footed and -2 to attack rolls. Only move actions available are Crawl and Stand. You can Take Cover while pron to gain greater cover (+4 AC) against ranged attacks",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042773:prone"
+    },
+    "Quickened": {
+        "Name": "Quickened",
+        "Description": "Gain 1 extra action at start of each turn.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042776:quickened"
+    },
+    "Restrained": {
+        "Name": "Restrainted",
+        "Description": "Flat-footed and immobilized (can't use actions with 'Move' trait). Can't use 'Attack' or 'Manipulate' actions except to Escape or Force Open your bonds. Overrides Grabbed.",
+        "hasValue": false,
+        "statusMarker": "6042778:restrained"
+    },
+    "Sickened": {
+        "Name": "Sickened",
+        "Description": "-[value] to all checks and DCs. Can't willingly ingest anything (including elixirs and potions). Can spend 1 action retching to attempt a FORT save against the effect DC to reduce Sickened value by 1 (or 2 on a crit success).",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042781:sickened"
+    },
+    "Slowed": {
+        "Name": "Slowed",
+        "Description": "Regain [value] fewer actions than normal at start of turn.",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042783:slowed"
+    },
+    "Stunned_Actions": {
+        "Name": "Stunned_Actions",
+        "Description": "Lose [value] actions, possibly over multiple turns. Overrides Slowed.",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042785:stunned"
+    },
+    "Stunned_Duration": {
+        "Name": "Stunned_Duration",
+        "Description": "Unable to take actions for the duration. Overrides Slowed.",
+        "hasValue": false,
+        "hasType": false,
+        "statusMarker": "6042785:stunned"
+    },
+    "Stupefied": {
+        "Name": "Stupefied",
+        "Description": "-[value] to all mental checks and DCs (Will saves, spell attack rolls, spell DCs, skills, etc). Casting a spell requires flat check against DC 5 + stupefied value.",
+        "hasValue": true,
+        "hasType": false,
+        "statusMarker": "6042787:stupefied"
+    }
+}
+
+
 // Function to reset GM macros used by this script to their correct values
 async function resetGMMacros(gm_id) {
     try {
@@ -34,10 +235,24 @@ async function resetGMMacros(gm_id) {
                 istokenaction: false
             },
             {
-                name: "Cycle",
+                name: "Image-Cycle",
                 _playerid: gm_id,
                 visibleto: gm_id,
                 action: '!cycle token',
+                istokenaction: true
+            },
+            {
+                name: "Conditions-Add",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!conditions init ?{Condition?|Blinded,Blinded|Clumsy,Clumsy|Concealed,Concealed|Confused,Confused|Dazzled,Dazzled|Deafened,Deafened|Doomed,Doomed|Drained,Drained|Encumbered,Encumbered|Enfeebled,Enfeebled|Fascinated,Fascinated|Fatigued,Fatigued|Fleeing,Fleeing|Frightened,Frightened|Grabbed,Grabbed|Immobilized,Immobilized|Invisible,Invisible|Paralyzed,Paralyzed|Persistent,Persistent|Petrified,Petrified|Prone,Prone|Quickened,Quickened|Restrained,Restrained|Sickened,Sickened|Slowed,Slowed|Stunned (Actions),Stunned_Actions|Stunned (Duration),Stunned_Duration|Stupefied,Stupefied}',
+                istokenaction: true
+            },
+            {
+                name: "Conditions-Show",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!conditions show',
                 istokenaction: true
             }
 
@@ -204,9 +419,9 @@ async function rollAgainstDC(DC, modifier) {
     })
 }
 
-// Function to construct an HTML table
+// Function to construct an HTML table from a tableData object (used internally by this script)
 // includeFooter is optional in case the calling function wants to add more rows at the bottom
-async function buildHTMLTable(tableData, includeFooter) {
+async function HTMLBuilder(tableData, includeFooter) {
     /* Example tableData obj:
      
      {
@@ -246,7 +461,7 @@ async function buildHTMLTable(tableData, includeFooter) {
                     {
                         string: "Critical Success",
                         style: "color:green; padding:5px"
-                    },
+                    }
                 ]
             ], ...
 
@@ -265,14 +480,17 @@ async function buildHTMLTable(tableData, includeFooter) {
                     '</tr>';
             });
 
-            // Build Columns Row
-            var columnString = '';
-            tableData.columns.forEach((column) => {
-                columnString = columnString + `<th width="${column.width}" align="${column.align}" style="${column.style}">${column.name}</th>`;
-            });
-            table = table + `<tr>${columnString}</tr></thead>`;
+            // Build Columns Row (Optional)
+            if (tableData.columns) {
+                var columnString = '';
+                tableData.columns.forEach((column) => {
+                    columnString = columnString + `<th width="${column.width}" align="${column.align}" style="${column.style}">${column.name}</th>`;
+                });
+                table = table + `<tr>${columnString}</tr></thead>`;
+            }
 
-            // Build Body Rows
+
+            // Build Rows
             tableData.rows.forEach((row) => {
                 var rowString = '<tr>';
                 row.forEach((item) => {
@@ -289,8 +507,8 @@ async function buildHTMLTable(tableData, includeFooter) {
             resolve(table);
 
         } catch (err) {
-            log("buildHTMLTable: Error: " + err.message);
-            sendChat("gmtools.js", "buildHTMLTable: Error: " + err.message);
+            log("HTMLBuilder: Error: " + err.message);
+            sendChat("gmtools.js", "HTMLBuilder: Error: " + err.message);
             reject(err.message);
         }
     });
@@ -633,7 +851,7 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
         });
 
         // Build open-ended table
-        var table = await buildHTMLTable(tableData, false);
+        var table = await HTMLBuilder(tableData, false);
 
         //Tag the tokens
         var taggedTokenIdsString = '';
@@ -744,6 +962,149 @@ async function groupSavesRemoveTags(tokenIdsString) {
     }
 }
 
+
+// Function to begin the process of adding a condition to one or more selected tokens
+// !conditions add <Condition>
+async function initAddCondition(selectedTokens, msg) {
+    try {
+
+        // Parse argument from string
+        const regex = /^\!conditions\sinit\s(.*)$/i;
+        const matches = msg.match(regex);
+        if (!matches) {
+            sendChat("gmtools.js", "addCondition: Error: Message does not match expected pattern.");
+            log("gmtools.js: addCondition: Error: Message does not match expected pattern.");
+            return;
+        }
+        const conditionArg = matches[1].replace(" ", "");
+
+        // Match to condition
+
+        const conditionObj = conditions[conditionArg];
+        if (!conditionObj) {
+            sendChat("gmtools.js", "addCondition: Error: Could not find matching Condition for: " + conditionArg);
+            log("gmtools.js: addCondition: Error: Could not find matching Condition for: " + conditionArg);
+            return;
+        }
+
+        // Save selected token ids as a @-separated string
+        var tokenIds = '';
+        await Promise.all(selectedTokens.map(async (token) => {
+            var id = token._id;
+            if (tokenIds == '') {
+                tokenIds = id;
+            } else {
+                tokenIds = tokenIds + "@" + id;
+            }
+        }));
+
+        // Some conditions need additional parameters
+        // Normalize parameters into a string, then provide Button to pass in additional parameters where needed
+        // Then we only need one "addCondition" function which can take either
+        var addConditionArg = "Name@" + conditionObj.Name + " tokenIds@" + tokenIds;
+        if ((conditionObj.hasValue === true) || (conditionObj.hasType === true)) {
+            if (conditionObj.hasType === true) {
+                addConditionArg = addConditionArg + " Type@?{" + conditionObj.Name + " Type?}";
+            } else {
+                addConditionArg = addConditionArg + " Type@None";
+            }
+            if (conditionObj.hasValue === true) {
+                addConditionArg = addConditionArg + " Value@?{" + conditionObj.Name + " Value?}";
+            } else {
+                addConditionArg = addConditionArg + " Value@None";
+            }
+            //sendChat("gmtools.js", "&{template:default} {{name=" + conditionObj.Name + " Parameters}} {{Enter= [HERE](!conditions add " + addConditionArg + ")}}");
+            sendChat("gmtools.js", `Provide parameters for ${conditionObj.Name}: [ENTER](!conditions add ${addConditionArg})`);
+        } else {
+            addConditionArg = addConditionArg + ` Type@None Value@None`;
+            addCondition("!conditions add " + addConditionArg);
+        }
+
+    } catch (err) {
+        log("initAddCondition: Error: " + err.message);
+        sendChat("gmtools.js", "initAddCondition: Error: " + err.message);
+    }
+}
+
+/* Function to take string argument from button or from initAddCondition(), and add condition to each token
+Example args:  
+
+From initAddCondition:  
+    !conditions add Name@Stunned(Duration) tokenIds@-NYn7O6o8eKzweLP1YBC:-NYin6YnQrDwvrx2h1GO Type@None Value@None
+    !conditions add Name@Fatigued tokenIds@-NYn7O6o8eKzweLP1YBC@-NYin6YnQrDwvrx2h1GO Type@None Value@None
+
+From button:
+    !conditions add Name@Stunned(Actions) tokenIds@-NYn7O6o8eKzweLP1YBC@-NYin6YnQrDwvrx2h1GO Type@None Value@5
+    !conditions add Name@Persistent tokenIds@-NYn7O6o8eKzweLP1YBC@-NYin6YnQrDwvrx2h1GO Type@Fire Value@9
+*/
+async function addCondition(arg) {
+    try {
+        // Parse argument string
+        const regexp = /^!conditions\s*add\s*Name\@(.*?)\s*tokenIds\@(.*?)\s*Type\@(.*?)\s*Value\@(.*?)\s*$/i;
+        const matches = arg.match(regexp);
+        if (matches) {
+            const conditionName = matches[1];
+            const tokenIds = matches[2].split('@');
+            var type = matches[3];
+            if (type === "None") { type = ''; }
+            var value = matches[4];
+            if (value === "None") { value = ''; }
+
+            // Get condition obj
+            const conditionObj = conditions[conditionName];
+
+            _.each(tokenIds, async (tokenId) => {
+                // Get token properties
+                const tokenObj = await getObj('graphic', tokenId);
+                const tokenName = await tokenObj.get('name');
+                const currentGmNotes = await tokenObj.get('gmnotes');  // ex:  [condition:Slowed type: value:1] [condition:Persistent type:Fire value:9]
+
+                // Check if condition is already there
+                const rgx = new RegExp(`\\[condition\\:${conditionObj.Name}\\stype\\:${type}\\svalue\\:${value}\\]`, "i");
+                if (currentGmNotes.match(rgx)) {
+                    // It's there - do nothing
+                    log(`addCondition: ${tokenName} already has condition: ${conditionObj.Name} ${type} ${value}`);
+                    sendChat("gmtools.js", `addCondition: ${tokenName} already has condition: ${conditionObj.Name} ${type} ${value}`);
+                    return;
+                } else {
+                    // It's not there - add it to gm notes
+                    var newGmNotes = currentGmNotes + ` [condition:${conditionObj.Name} type:${type} value:${value}]`;
+                    await tokenObj.set('gmnotes', newGmNotes);
+
+                    // And add status marker. Only "Persistent" gets a number
+                    if (conditionObj.Name == 'Persistent') {
+                        await tokenObj.set(`status_${conditionObj.statusMarker}`, value);
+                    } else {
+                        await tokenObj.set(`status_${conditionObj.statusMarker}`, true);
+                    }
+
+                    // And log it
+                    sendChat("gmtools.js", `Added to ${tokenName}: ${conditionObj.Name} ${type} ${value}`);
+                }
+            });
+        }
+        else {
+            log("addCondition: Error: Unexpected parameter string: " + arg);
+            sendChat("gmtools.js", "addCondition: Error: Unexpected parameter string: " + arg);
+        }
+    } catch (err) {
+        log("addCondition: Error: " + err.message);
+        sendChat("gmtools.js", "addCondition: Error: " + err.message);
+    }
+}
+
+async function showConditions(selectedToken) {
+    try {
+
+        // TBD
+
+    } catch (err) {
+        log("showConditions: Error: " + err.message);
+        sendChat("gmtools.js", "showConditions: Error: " + err.message);
+    }
+}
+
+
 on('ready', async function () {
     "use strict";
 
@@ -836,6 +1197,26 @@ on('ready', async function () {
                 cycleToken(msg.selected);
             }
 
+            // Initialize Add Condition (GM Only, called with macro)
+            if ((msg.content.match(/^!conditions\sinit/i)) && (typeof msg.selected != 'undefined') && (playerIsGM(msg.playerid))) {
+                initAddCondition(msg.selected, msg.content);
+            }
+
+            // Add Condition (GM Only, called internally)
+            if ((msg.content.match(/^!conditions\sadd/i)) && (playerIsGM(msg.playerid))) {
+                addCondition(msg.content);
+            }
+
+            // Show Conditions (GM Only, called with macro, single token)
+            if ((msg.content.match(/^!conditions\sshow/i)) && (playerIsGM(msg.playerid))) {
+                if ((msg.selected).length === 1) {
+                    showConditions(msg.selected);
+                } else {
+                    log("gmtools.js: Show Conditions only works for a single token.");
+                    sendChat("gmtools.js", "Show Conditions only works for a single token.");
+                }
+                
+            }
 
         } catch (err) {
             log("Error: " + err.message);

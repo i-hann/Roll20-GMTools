@@ -18,7 +18,7 @@ Rolls Initiative for the selected token(s), displaying the results in chat and a
 ### Group-Saves (Macro - Token Action)
 Rolls Saving Throws for the selected token(s). Tokens with the same image are assumed to have the same Saving Throw modifiers. On execution, the command first queries the GM for the Saving Throw type (Fortitude, Reflex, or Will) and the DC (ex: 17). Then a chat menu is displayed with a "ROLL" button for each Token Group. Pressing a ROLL button queries the GM for the Saving Throw modifier of that Token Group. Then, it rolls all of the saves for the group and displays them in a new table with custom HTML.
 
-### Cycle (Macro - Token Action)
+### Image-Cycle (Macro - Token Action)
 After creating a Rollable Table in Roll20 with multiple images for a token, the Cycle button will increment the token's image by one table item each time (i.e. 1 -> 2 -> 3 -> 1)
 
 ### Death Sound Effects
@@ -26,3 +26,6 @@ Treating Bar 3 as HP, any token that drops to 0 HP or lower will trigger a Death
 
 ### HP Tinting
 Treating Bar 3 as HP, any token that drops below 50% HP will be tinted on a gradient of yellow -> orange -> red until they hit 0.
+
+### Conditions-Add
+Add a condition ("Slowed", "Paralyzed", etc.) to one or more selected tokens. This puts an appropriate status marker on the token (requires import of custom status markers) and also stores the full status data in the token's GM notes. For conditions that require additional parameters such as Value (ex. Slowed "2") and/or Type (ex. Persistent "Fire"), a button is provided in the chat for the user to provide the parameters.
