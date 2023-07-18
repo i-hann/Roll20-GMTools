@@ -1053,7 +1053,47 @@ async function addCondition(arg) {
             // Get condition obj
             const conditionObj = conditions[conditionName];
 
-            _.each(tokenIds, async (tokenId) => {
+            // Build the top of the table
+            var title = conditionObj.Name;
+            var description = conditionObj.Description;
+            if (type.match(/\S/i)) {
+                title = title + ' ' + type
+                description = description.replace(/\[type\]/i, type);
+            }
+            if (value.match(/\S/i)) {
+                title = title + ' ' + value
+                description = description.replace(/\[value\]/i, value);
+            }
+            var tableData = {
+                style: "width:100%; border: 1px solid purple",
+                headers: [
+                    {
+                        name: title,
+                        style: "background-color:purple; color:white; padding:8px; font-size:25px",
+                        align: "center",
+                        colspan: "1"
+                    }
+                ],
+                columns: [],
+                rows: []
+            };
+
+            var firstRow = [];
+            firstRow.push({
+                string: description,
+                style: "padding:8px"
+            });
+            var secondRow = [];
+            secondRow.push({
+                string: "Recipients",
+                style: "padding:8px; background-color:purple; color:white; font-size:20px"
+            });
+
+            tableData.rows.push(firstRow);
+            tableData.rows.push(secondRow);
+
+            // Loop through tokens
+            await Promise.all(tokenIds.map(async (tokenId) => {
                 // Get token properties
                 const tokenObj = await getObj('graphic', tokenId);
                 const tokenName = await tokenObj.get('name');
@@ -1065,7 +1105,6 @@ async function addCondition(arg) {
                     // It's there - do nothing
                     log(`addCondition: ${tokenName} already has condition: ${conditionObj.Name} ${type} ${value}`);
                     sendChat("gmtools.js", `addCondition: ${tokenName} already has condition: ${conditionObj.Name} ${type} ${value}`);
-                    return;
                 } else {
                     // It's not there - add it to gm notes
                     var newGmNotes = currentGmNotes + ` [condition:${conditionObj.Name} type:${type} value:${value}]`;
@@ -1073,15 +1112,31 @@ async function addCondition(arg) {
 
                     // And add status marker. Only "Persistent" gets a number
                     if (conditionObj.Name == 'Persistent') {
-                        await tokenObj.set(`status_${conditionObj.statusMarker}`, value);
+                        tokenObj.set(`status_${conditionObj.statusMarker}`, value);
                     } else {
-                        await tokenObj.set(`status_${conditionObj.statusMarker}`, true);
+                        tokenObj.set(`status_${conditionObj.statusMarker}`, true);
                     }
 
-                    // And log it
-                    sendChat("gmtools.js", `Added to ${tokenName}: ${conditionObj.Name} ${type} ${value}`);
+                    // And to the table
+                    var row = [];
+                    row.push({
+                        string: tokenName,
+                        style: "padding:5px; font-size:14px"
+                    });
+                    tableData.rows.push(row);
                 }
+            }));
+
+            // Build the table
+            const table = await HTMLBuilder(tableData, true);
+
+            sendChat("gmtools.js", table);
+
+            /*
+            _.each(tokenIds, async (tokenId) => {
+                
             });
+            */
         }
         else {
             log("addCondition: Error: Unexpected parameter string: " + arg);
