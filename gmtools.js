@@ -109,35 +109,110 @@ const conditions = {
         "hasValue": false,
         "statusMarker": "6042769:paralysed"
     },
+    "Persistent": {
+        "Name": "Persistent",
+        "Description": "Take [value] untyped damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174223:generic",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351611442/OLZdo4iiIKZzR8cDozoqdQ/max.png?1690126254"
+    },
     "Persistent_Fire": {
         "Name": "Persistent_Fire",
         "Description": "Take [value] fire damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6171782:fire"
+        "statusMarker": "6174221:fire",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604921/BskZgPrQpYJUHL77r2wAzQ/max.png?1690123630"
     },
     "Persistent_Cold": {
         "Name": "Persistent_Cold",
         "Description": "Take [value] cold damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6171791:cold"
+        "statusMarker": "6174219:cold",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604923/QL7fcJL6vtUmWIu649jARQ/max.png?1690123630"
     },
     "Persistent_Acid": {
         "Name": "Persistent_Acid",
         "Description": "Take [value] acid damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6171853:acid"
+        "statusMarker": "6174216:acid",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604918/WWHnjAEaTS1Cwb5x2bZAaQ/max.png?1690123630"
     },
     "Persistent_Electricity": {
         "Name": "Persistent_Electricity",
         "Description": "Take [value] electricity damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6171854:electricity"
+        "statusMarker": "6174220:electricity",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604920/z8YikuoUGBaOUtpBnxsw0A/max.png?1690123630"
     },
     "Persistent_Bleed": {
         "Name": "Persistent_Bleed",
         "Description": "Take [value] bleed damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6171986:bleed"
+        "statusMarker": "6174217:bleed",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604916/fwT7KzjClcnb8Fo36c3a0w/max.png?1690123630"
+    },
+    "Persistent_Sonic": {
+        "Name": "Persistent_Sonic",
+        "Description": "Take [value] sonic damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174215:sonic",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604919/XBm84AS42XEPhLa34wBRJA/max.png?1690123630"
+    },
+    "Persistent_Bludgeoning": {
+        "Name": "Persistent_Bludgeoning",
+        "Description": "Take [value] bludgeoning damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174218:bludgeoning",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604924/ri-f66Na072pfX7EGY0JEQ/max.png?1690123630"
+    },
+    "Persistent_Force": {
+        "Name": "Persistent_Force",
+        "Description": "Take [value] force damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174222:force",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604914/qD89yAoTar6uqMWVyLokhw/max.png?1690123630"
+    },
+    "Persistent_Mental": {
+        "Name": "Persistent_Mental",
+        "Description": "Take [value] mental damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174224:mental",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604926/WcvmXlxUNtRiMKQXtpqq-w/max.png?1690123630"
+    },
+    "Persistent_Negative": {
+        "Name": "Persistent_Negative",
+        "Description": "Take [value] negative energy damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174225:negative",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604913/iKKC3-1dy9Lxzh4lpoRHpw/max.png?1690123630"
+    },
+    "Persistent_Piercing": {
+        "Name": "Persistent_Piercing",
+        "Description": "Take [value] piercing damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174226:piercing",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604927/Sh89z6W5ftrya0yhGKWynA/max.png?1690123630"
+    },
+    "Persistent_Poison": {
+        "Name": "Persistent_Poison",
+        "Description": "Take [value] poison damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174227:poison",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604915/es0_8jnun76jEvRGLgIodQ/max.png?1690123630"
+    },
+    "Persistent_Positive": {
+        "Name": "Persistent_Positive",
+        "Description": "Take [value] positive energy damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174228:positive",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604922/1Lg1No3uuUH87XkdGD9UdA/max.png?1690123630"
+    },
+    "Persistent_Slashing": {
+        "Name": "Persistent_Slashing",
+        "Description": "Take [value] slashing damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
+        "hasValue": true,
+        "statusMarker": "6174229:slashing",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604917/FvypPESW7V-Ou0DNdnX5Ag/max.png?1690123630"
     },
     "Petrified": {
         "Name": "Petrified",
@@ -195,7 +270,6 @@ const conditions = {
     }
 }
 
-
 // Function to reset GM macros used by this script to their correct values
 async function resetGMMacros(gm_id) {
     try {
@@ -242,7 +316,7 @@ async function resetGMMacros(gm_id) {
                 name: "Conditions-Add",
                 _playerid: gm_id,
                 visibleto: gm_id,
-                action: '!conditions init ?{Condition?|Blinded,Blinded|Clumsy,Clumsy|Concealed,Concealed|Confused,Confused|Dazzled,Dazzled|Deafened,Deafened|Doomed,Doomed|Drained,Drained|Encumbered,Encumbered|Enfeebled,Enfeebled|Fascinated,Fascinated|Fatigued,Fatigued|Fleeing,Fleeing|Frightened,Frightened|Grabbed,Grabbed|Immobilized,Immobilized|Invisible,Invisible|Paralyzed,Paralyzed|Persistent Acid,Persistent_Acid|Persistent Bleed,Persistent_Bleed|Persistent Cold,Persistent_Cold|Persistent Electricity,Persistent_Electricity|Persistent Fire,Persistent_Fire|Petrified,Petrified|Prone,Prone|Quickened,Quickened|Restrained,Restrained|Sickened,Sickened|Slowed,Slowed|Stunned (Actions),Stunned_Actions|Stunned (Duration),Stunned_Duration|Stupefied,Stupefied}',
+                action: '!conditions init ?{Condition?|Blinded,Blinded|Clumsy,Clumsy|Concealed,Concealed|Confused,Confused|Dazzled,Dazzled|Deafened,Deafened|Doomed,Doomed|Drained,Drained|Encumbered,Encumbered|Enfeebled,Enfeebled|Fascinated,Fascinated|Fatigued,Fatigued|Fleeing,Fleeing|Frightened,Frightened|Grabbed,Grabbed|Immobilized,Immobilized|Invisible,Invisible|Paralyzed,Paralyzed|Persistent,Persistent|Persistent Acid,Persistent_Acid|Persistent Bludgeoning,Persistent_Bludgeoning|Persistent Bleed,Persistent_Bleed|Persistent Cold,Persistent_Cold|Persistent Electricity,Persistent_Electricity|Persistent Fire,Persistent_Fire|Persistent Force,Persistent_Force|Persistent Mental,Persistent_Mental|Persistent Negative,Persistent_Negative|Persistent Piercing,Persistent_Piercing|Persistent Poison,Persistent_Poison|Persistent Positive,Persistent_Positive|Persistent Slashing,Persistent_Slashing|Persistent Sonic,Persistent_Sonic|Petrified,Petrified|Prone,Prone|Quickened,Quickened|Restrained,Restrained|Sickened,Sickened|Slowed,Slowed|Stunned (Actions),Stunned_Actions|Stunned (Duration),Stunned_Duration|Stupefied,Stupefied}',
                 istokenaction: true
             },
             {
@@ -293,7 +367,8 @@ async function debugGraphic(selectedObj) {
         const controlledby = await graphicObj.get('controlledby');
         const tint_color = await graphicObj.get('tint_color');
         const status_markers = await graphicObj.get('statusmarkers');
-        sendChat("gmtools.js", `&{template:default}{{name=${name}}}{{id=${id}}}{{type=${type}}}{{subtype=${subtype}}}{{pageid=${pageid}}}{{controlledby=${controlledby}}}{{tint_color=${tint_color}}}{{status_markers=${status_markers}}}`);
+        const imgsrc = await graphicObj.get('imgsrc');
+        sendChat("gmtools.js", `&{template:default}{{name=${name}}}{{id=${id}}}{{type=${type}}}{{subtype=${subtype}}}{{pageid=${pageid}}}{{controlledby=${controlledby}}}{{tint_color=${tint_color}}}{{status_markers=${status_markers}}}{{imgsrc=${imgsrc}}}`);
 
     } catch (err) {
         sendChat("gmtools.js", "gmtools.js: debugGraphic: Error: " + err.message);
@@ -450,15 +525,21 @@ async function HTMLBuilder(tableData, includeFooter) {
                 [
                     {
                         string: "Giant Ant",
-                        style: "padding:5px"
+                        style: "padding:5px",
+                        colspan: "1",
+                        width: "20%",
                     },
                     {
                         string: "(15) + 7 = <b>22</b>",
-                        style: "padding:5px"
+                        style: "padding:5px",
+                        colspan: "1"
+                        width: "40%"
                     },
                     {
                         string: "Critical Success",
-                        style: "color:green; padding:5px"
+                        style: "color:green; padding:5px",
+                        colspan: "1",
+                        width: "40%"
                     }
                 ]
             ], ...
@@ -492,7 +573,8 @@ async function HTMLBuilder(tableData, includeFooter) {
             tableData.rows.forEach((row) => {
                 var rowString = '<tr>';
                 row.forEach((item) => {
-                    rowString = rowString + `<td style="${item.style}">${item.string}</td>`;
+                    if (typeof item.colspan == 'undefined') { item.colspan = "1"; }
+                    rowString = rowString + `<td colspan="${item.colspan}" width="${item.width}" style="${item.style}">${item.string}</td>`;
                 });
                 rowString = rowString + '</tr>';
                 table = table + rowString;
@@ -609,6 +691,7 @@ async function handleDeath(token, deathSfxPlaylist) {
     }
 }
 
+// Function to change a token's tint when its HP (bar 3) has changed
 async function handleHpTint(token, hpTints) {
     try {
         // Get Token Object
@@ -822,13 +905,15 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
             // Name
             row.push({
                 string: result.name,
-                style: "padding:5px"
+                style: "padding:5px",
+                width: "30%"
             });
 
             // Roll
             row.push({
                 string: `(${result.roll}) + ${saveMod} = <b>${result.total}</b>`,
-                style: "padding:5px"
+                style: "padding:5px",
+                width: "50%"
             });
 
             // Outcome
@@ -841,7 +926,8 @@ async function displayGroupSaveResult(groupResults, saveMod, saveType, saveDC) {
             }
             row.push({
                 string: outcomeString,
-                style: `color:${outcomeColor}; padding:5px`
+                style: `color:${outcomeColor}; padding:5px`,
+                width: "20%"
             });
 
             // Push to tableData
@@ -977,7 +1063,6 @@ async function initAddCondition(selectedTokens, msg) {
         const conditionArg = matches[1].replace(" ", "");
 
         // Match to condition
-
         const conditionObj = conditions[conditionArg];
         if (!conditionObj) {
             sendChat("gmtools.js", "addCondition: Error: Could not find matching Condition for: " + conditionArg);
@@ -1002,7 +1087,7 @@ async function initAddCondition(selectedTokens, msg) {
         var addConditionArg = "Name@" + conditionObj.Name + " tokenIds@" + tokenIds;
         if (conditionObj.hasValue === true) {
             addConditionArg = addConditionArg + " Value@?{" + conditionObj.Name + " Value?}";
-            sendChat("gmtools.js", `Provide parameters for ${conditionObj.Name}: [ENTER](!conditions add ${addConditionArg})`);
+            sendChat("gmtools.js", `/w gm Provide parameters for ${conditionObj.Name}: [ENTER](!conditions add ${addConditionArg})`);
         } else {
             addConditionArg = addConditionArg + ` Value@None`;
             addCondition("!conditions add " + addConditionArg);
@@ -1052,11 +1137,17 @@ async function addCondition(arg) {
                 title = title + ' ' + value
                 description = description.replace(/\[value\]/i, value);
             }
+
+            var imgString = '';
+            if (typeof conditionObj.imgsrc != 'undefined') {
+                imgString = `<img src="${conditionObj.imgsrc} height="25" width="25"> `;
+            }
+
             var tableData = {
                 style: "width:100%; border: 1px solid purple",
                 headers: [
                     {
-                        name: title,
+                        name: `${imgString}${title}`,
                         style: "background-color:purple; color:white; padding:8px; font-size:25px",
                         align: "center",
                         colspan: "1"
@@ -1069,12 +1160,14 @@ async function addCondition(arg) {
             var firstRow = [];
             firstRow.push({
                 string: description,
-                style: "padding:8px"
+                style: "padding:8px",
+                width: "100%"
             });
             var secondRow = [];
             secondRow.push({
                 string: "Recipients",
-                style: "padding:8px; background-color:purple; color:white; font-size:20px; text-align:center"
+                style: "padding:8px; background-color:purple; color:white; font-size:20px; text-align:center",
+                width: "100%"
             });
 
             tableData.rows.push(firstRow);
@@ -1114,7 +1207,8 @@ async function addCondition(arg) {
                     var row = [];
                     row.push({
                         string: tokenName,
-                        style: "padding:5px; font-size:14px"
+                        style: "padding:5px; font-size:14px",
+                        width: "100%"
                     });
                     tableData.rows.push(row);
                 }
@@ -1206,10 +1300,127 @@ async function removeCondition(arg) {
     }
 }
 
+/* Function to take a selected token and display all of its active conditions in the chat
+Conditions are taken from the token's gmnotes which look like this:
+      [condition:Blinded value:] [condition:Persistent_Positive value:3] [condition:Persistent_Slashing value:8] [condition:Persistent_Fire value:10]
+We also want a button next to each condition to remove it with this command:
+      !conditions remove Name@Stunned(Duration) tokenIds@-NYn7O6o8eKzweLP1YBC Value@None
+*/
 async function showConditions(selectedToken) {
     try {
+        // Get token attributes
+        const tokenObj = await getObj('graphic', selectedToken._id);
+        const tokenName = await tokenObj.get('name');
+        const gmNotes = await tokenObj.get('gmnotes');
 
-        // TBD
+        // Parse conditions from gm notes into conditionsArray (an array of condition objects)
+        var gmNotesArray = await gmNotes.split("] [");
+        var conditionsArray = [];
+        await Promise.all(gmNotesArray.map(async (conditionString) => {
+            conditionString = conditionString.replace("[", "");
+            conditionString = conditionString.replace("]", "");
+
+            // conditionString ex: condition:Blinded value:
+            //                     condition:Persistent_Positive value:3
+            //                     condition:Persistent_Slashing value:8
+            //                     condition:Persistent_Fire value:10
+
+            const nameRgx = /condition\:(.*?)\s+/i;
+            const nameMatches = conditionString.match(nameRgx);
+            const valueRgx = /value\:([0-9]*)/i;
+            const valueMatches = conditionString.match(valueRgx);
+
+            var conditionValue = 'None';
+            if (valueMatches) {
+                conditionValue = valueMatches[1];
+            }
+
+            if (nameMatches) {
+                var conditionObj = conditions[nameMatches[1]];
+                if (typeof conditionObj != 'undefined') {
+                    conditionObj.currentValue = conditionValue;
+                    conditionsArray.push(conditionObj);
+                } else {
+                    log(`gmtools.js: showConditions: ERROR: Unexpected condition name: '${nameMatches[1]}' in gmnotes for token: '${tokenName}'`);
+                }
+
+            }
+        }));
+
+        // Create table from conditionsArray
+        var tableData = {
+            style: "width:100%; border: 1px solid purple",
+            headers: [
+                {
+                    name: `${tokenName} Conditions`,
+                    style: "background-color:purple; color:white; padding:8px; font-size:25px",
+                    align: "center",
+                    colspan: "2"
+                }
+            ],
+            columns: [],
+            rows: []
+        };
+
+        await Promise.all(conditionsArray.map(async (conditionObj) => {
+            /* Example conditionObj:
+             {
+             "Name": "Confused",
+             "Description": "Flat-footed, can't benefit from flanking, can't Delay or Ready, can't use Reactions. All actions must be spent on Strikes or offensive Cantrips against a random target determined by the GM. If there are no targets, you target yourself, automatically hitting. Each time you take damage, you get a flat DC 11 check to overcome the confusion.",
+             "hasValue": false,
+             "statusMarker": "6042739:confused",
+             "currentValue": "None",
+             "imgsrc": "https://....."
+             }
+            */
+
+            // First Row: Left side is condition name, right side is remove button
+            var firstRow = [];
+            var conditionNameString = (conditionObj.Name).replace("_", " ");
+            if (conditionObj.currentValue != 'None') {
+                conditionNameString = conditionNameString + " " + conditionObj.currentValue;
+            }
+            var imgString = '';
+            if (typeof conditionObj.imgsrc != 'undefined') {
+                imgString = `<img src="${conditionObj.imgsrc}" width="18" height="18"> `;
+            }
+
+            const removeButton = `[REMOVE](!conditions remove Name@${conditionObj.Name} tokenIds@${selectedToken._id} value@${conditionObj.currentValue})`
+
+            firstRow.push({
+                "string": `${imgString}<b>${conditionNameString}</b>`,
+                "style": "padding:5px; text-align: left",
+                "colspan": "1",
+                "width": "85%"
+            });
+
+            firstRow.push({
+                "string": removeButton,
+                "style": "padding:5px; text-align: right; font-size:10px",
+                "colspan": "1",
+                "width": "15%"
+            });
+
+            // Second Row: Description
+            var secondRow = [];
+            var desc = conditionObj.Description;
+            if (desc.match(/\[value\]/i)) {
+                desc = desc.replace(/\[value\]/i, conditionObj.currentValue);
+            }
+            secondRow.push({
+                "string": desc,
+                "style": "padding:5px; text-align: left; border-bottom: 1px solid purple",
+                "colspan": "2",
+                "width": "100%"
+            });
+
+            (tableData.rows).push(firstRow);
+            (tableData.rows).push(secondRow);
+        }));
+
+        const table = await HTMLBuilder(tableData, true);
+
+        sendChat("gmtools.js", table);
 
     } catch (err) {
         log("showConditions: Error: " + err.message);
@@ -1328,7 +1539,7 @@ on('ready', async function () {
             // Show Conditions (GM Only, called with macro, single token only)
             if ((msg.content.match(/^!conditions\sshow/i)) && (playerIsGM(msg.playerid))) {
                 if ((msg.selected).length === 1) {
-                    showConditions(msg.selected);
+                    showConditions(msg.selected[0]);
                 } else {
                     log("gmtools.js: Show Conditions only works for a single token.");
                     sendChat("gmtools.js", "Show Conditions only works for a single token.");
