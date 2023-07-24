@@ -1,3 +1,48 @@
+/*
+exploration activities notes
+
+player sends message
+script grabs "Speaking As:" name, and player ID, from the message
+script checks roll20 journal for exactly one entry with same name as "Speaking As":
+script verifies the entry has "ControlledBy" equal to player ID
+*/
+
+// Exploration Activities
+const exploration_activities = [
+    {
+        "Name": "Avoid Notice",
+        "Description": "Repeatedly roll Stealth to determine if enemies notice you. Use Stealth for Initiative in the next encounter."
+    },
+    {
+        "Name": "Defend",
+        "Description": "At the start of the next encounter, your shield is already raised (as 'Raise Shield' action)."
+    },
+    {
+        "Name": "Follow the Expert",
+        "Description": "Follow an ally who is at least Expert in a skill. Add your level as a bonus to your own checks with that skill, as well as a bonus based on your ally's proficiency (expert +2, master +3, legendary +4)."
+    },
+    {
+        "Name": "Investigate",
+        "Description": "Use Recall Knowledge to discover clues among the various things you see and engage with."
+    },
+    {
+        "Name": "Repeat a Spell",
+        "Description": "Repeatedly cast the same spell (2 actions or fewer)."
+    },
+    {
+        "Name": "Scout",
+        "Description": "At the start of the next encounter, your party gains +1 to initiative."
+    },
+    {
+        "Name": "Search",
+        "Description": "Repeatedly roll Perception to spot hidden doors, traps, and hazards."
+    },
+    {
+        "Name": "Treat Wounds",
+        "Description": "Use Medicine to treat creatures' wounds."
+    }
+];
+
 // Conditions
 const conditions = {
     "Rules": "Conditions of the same name and value don't stack - the duration becomes the longer of the two. Conditions with different values are considered different conditions. If you’re affected by a condition with a value multiple times, you apply only the highest value, although you might have to track both durations if one has a lower value but lasts longer.",
@@ -137,8 +182,8 @@ const conditions = {
         "Name": "Persistent_Fire",
         "Description": "Take [value] fire damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6174221:fire",
-        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604921/BskZgPrQpYJUHL77r2wAzQ/max.png?1690123630"
+        "statusMarker": "6176572:fire",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351772322/xU49SGzDUrZmCuN-lfdv7Q/max.png?1690214231"
     },
     "Persistent_Cold": {
         "Name": "Persistent_Cold",
@@ -172,8 +217,8 @@ const conditions = {
         "Name": "Persistent_Sonic",
         "Description": "Take [value] sonic damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6174215:sonic",
-        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604919/XBm84AS42XEPhLa34wBRJA/max.png?1690123630"
+        "statusMarker": "6176571:sonic",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351772327/v0RJXlJnYv3FUnhfl4PdGg/max.png?1690214234"
     },
     "Persistent_Bludgeoning": {
         "Name": "Persistent_Bludgeoning",
@@ -186,15 +231,15 @@ const conditions = {
         "Name": "Persistent_Force",
         "Description": "Take [value] force damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6174222:force",
-        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604914/qD89yAoTar6uqMWVyLokhw/max.png?1690123630"
+        "statusMarker": "6176573:force",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351772317/TGtTIG0SIE4UVASQpJ2xHw/max.png?1690214229"
     },
     "Persistent_Mental": {
         "Name": "Persistent_Mental",
         "Description": "Take [value] mental damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6174224:mental",
-        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604926/WcvmXlxUNtRiMKQXtpqq-w/max.png?1690123630"
+        "statusMarker": "6179321:mental",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351790064/JlvAeG1uvYU4XbGsnijRcQ/max.png?1690223787"
     },
     "Persistent_Negative": {
         "Name": "Persistent_Negative",
@@ -221,8 +266,8 @@ const conditions = {
         "Name": "Persistent_Positive",
         "Description": "Take [value] positive energy damage at the end of each turn. Then, make DC 15 flat check to end the condition.",
         "hasValue": true,
-        "statusMarker": "6174228:positive",
-        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604922/1Lg1No3uuUH87XkdGD9UdA/max.png?1690123630"
+        "statusMarker": "6176570:positive",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351772329/tOqrr6aY2wfw1iK2UdJZaA/max.png?1690214235"
     },
     "Persistent_Slashing": {
         "Name": "Persistent_Slashing",
@@ -1329,7 +1374,7 @@ async function removeCondition(arg) {
 /* Function to take a selected token and display all of its active conditions in the chat
 Conditions are taken from the token's gmnotes which look like this:
       [condition:Blinded value:] [condition:Persistent_Positive value:3] [condition:Persistent_Slashing value:8] [condition:Persistent_Fire value:10]
-We also want a button next to each condition to remove it with this command:
+A button is provided next to each condition to remove it with this command:
       !conditions remove Name@Stunned(Duration) tokenIds@-NYn7O6o8eKzweLP1YBC Value@None
 */
 async function showConditions(selectedToken) {
@@ -1454,6 +1499,169 @@ async function showConditions(selectedToken) {
     }
 }
 
+/* Function to display the Exploration Activity options to a player
+Buttons in the table allow the player to choose which Activity they want their character to assume
+      [CHOOSE](!exploration choose <playerId> <speakingas> <activityName>)
+*/
+async function ExplorationShowChoices(playerId) {
+    try {
+        // First we need to verify the player is using "Speaking As" which matches a character in the journal
+        const playerObj = await getObj('player', playerId);
+        const speakingAs = await playerObj.get('speakingas');
+        const playerName = await playerObj.get('_displayname');
+        const regex = /^character\|(.*)$/i;
+        const characterMatches = speakingAs.match(regex);
+        if (characterMatches) {
+            // Player is speaking as a character
+
+            // Build Exploration Table data
+            const tableData = {
+                style: "width:100%; border: 1px solid purple",
+                headers: [
+                    {
+                        name: `Exploration Activities`,
+                        style: "background-color:purple; color:white; padding:8px; font-size:25px",
+                        align: "center",
+                        colspan: "2"
+                    }
+                ],
+                columns: [],
+                rows: []
+            }
+
+            
+            await Promise.all(exploration_activities.map(async (activity) => {
+                var firstRow = [];
+                var chooseButton = `[CHOOSE](!exploration choose ${speakingAs} ${activity.Name})`;
+                firstRow.push({
+                    "string": `<b>${activity.Name}</b>`,
+                    "style": "padding:5px; text-align: left",
+                    "colspan": "1",
+                    "width": "85%"
+                });
+                firstRow.push({
+                    "string": chooseButton,
+                    "style": "padding:5px; text-align: right; font-size:10px",
+                    "colspan": "1",
+                    "width": "15%"
+                });
+
+                var secondRow = [];
+                secondRow.push({
+                    "string": activity.Description,
+                    "style": "padding:5px; text-align: left; border-bottom: 1px solid purple",
+                    "colspan": "2",
+                    "width": "100%"
+                });
+
+                tableData.rows.push(firstRow);
+                tableData.rows.push(secondRow);
+            }));
+
+            // Create Table
+            const table = await HTMLBuilder(tableData);
+
+            // Display Exploration Table to player
+            sendChat("gmtools.js", `/w ${playerName} ${table}`);
+            
+        } else {
+            // Player is not speaking as a character
+            sendChat("gmtools.js", `/w ${playerName} To use the Exploration Activities menu, you must set your "As:" value (below this window) to your character.`);
+        }
+    } catch (err) {
+        log("ExplorationShowChoices: Error: " + err.message);
+        sendChat("gmtools.js", "ExplorationShowChoices: Error: " + err.message);
+    }
+}
+
+/* Function to take a player's choice of Exploration Activity
+   and store it as data in the 'Exploration' Handout
+*/
+async function ExplorationChoose(arg) {
+    try {
+        // Parse the argument
+        // arg ex: !exploration choose speakingAs activityName
+        const regex = /^!exploration\schoose\s(.*?)\s(.*?)$/i;
+        const matches = arg.match(regex);
+        if (matches) {
+            const speakingAs = (matches[1]).replace(/character\|/i, "");
+            const characterObj = await getObj('character', speakingAs);
+            const characterName = await characterObj.get('name');
+            const activityName = matches[2];
+
+            // Find Handout obj
+            const handoutObjs = await findObjs({
+                _type: 'handout',
+                name: 'Exploration'
+            });
+            if ((typeof handoutObjs != 'undefined') && (handoutObjs.length == 1)) {
+                // Unique 'Exploration' handout found
+                const handout = handoutObjs[0];
+                handout.get('gmnotes', (gmnotes) => {
+
+                    const r = new RegExp(`\\[${speakingAs}:(.*?)\\]`);
+                    const matches = gmnotes.match(r);
+                    if (matches) {
+                        // Replace old role with new one
+                        gmnotes = gmnotes.replace(matches[1], activityName);
+                    } else {
+                        // Or add role
+                        gmnotes = gmnotes + `[${speakingAs}:${activityName}]`;
+                    }
+
+                    // Set new gmnotes
+                    handout.set('gmnotes', gmnotes);
+
+                    // Log to chat
+                    sendChat(characterName, `/desc changed their Exploration Activity to ${activityName}.`);
+                });
+
+            } else {
+                // Unique 'Exploration' handout not found
+                log("ExplorationChoose: Error: Failed to find a singular Exploration handout (check for absence or duplicates)");
+                sendChat("gmtools.js", "ExplorationChoose: Error: Failed to find a singular Exploration handout (check for absence or duplicates)");
+            }
+        } else {
+            log("ExplorationChoose: Unexpected argument: " + arg);
+            sendChat("gmtools.js", "ExplorationChoose: Unexpected argument: " + arg);
+        }
+
+    } catch (err) {
+        log("ExplorationChoose: Error: " + err.message);
+        sendChat("gmtools.js", "ExplorationChoose: Error: " + err.message);
+    }
+}
+
+// Function to display the data from the Exploration handout as a table
+async function ExplorationDisplay() {
+    try {
+        // Get handout data
+        const handoutObjs = await findObjs({
+            _type: 'handout',
+            name: 'Exploration'
+        });
+        if ((typeof handoutObjs != 'undefined') && (handoutObjs.length == 1)) {
+            const handout = handoutObjs[0];
+            handout.get('gmnotes', async (gmnotes) => {
+
+                // TBD
+
+
+
+
+            });
+
+        } else {
+            // Unique 'Exploration' handout not found
+            log("ExplorationDisplay: Error: Failed to find a singular Exploration handout (check for absence or duplicates)");
+            sendChat("gmtools.js", "ExplorationDisplay: Error: Failed to find a singular Exploration handout (check for absence or duplicates)");
+        }
+    } catch (err) {
+        log("ExplorationDisplay: Error: " + err.message);
+        sendChat("gmtools.js", "ExplorationDisplay: Error: " + err.message);
+    }
+}
+
 
 on('ready', async function () {
     "use strict";
@@ -1570,7 +1778,21 @@ on('ready', async function () {
                     log("gmtools.js: Show Conditions only works for a single token.");
                     sendChat("gmtools.js", "Show Conditions only works for a single token.");
                 }
-                
+            }
+
+            // Show Exploration Activity Menu (Player-accessible, called with macro)
+            if ((msg.content.match(/^!exploration\s*$/i))) {
+                ExplorationShowChoices(msg.playerid);
+            }
+
+            // Player chooses an Exploration Activity (called by button)
+            if ((msg.content.match(/^!exploration choose/i))) {
+                ExplorationChoose(msg.content);
+            }
+
+            // Display Exploration Activity (GM Only, called with macro)
+            if ((msg.content.match(/^!exploration display/i)) && (playerIsGM(msg.playerid))) {
+                ExplorationDisplay();
             }
 
         } catch (err) {
