@@ -5,49 +5,57 @@ const conditions = {
         "Name": "Blinded",
         "Description": "Can't see. All terrain is difficult. Immune to visual effects. Overrides Dazzled.",
         "hasValue": false,
-        "statusMarker": "6042735:blinded"
+        "statusMarker": "6042735:blinded",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604554/EWJnTmiQ9BNoZ2YsFwpBNA/max.png?1690123452"
     },
     "Clumsy": {
         "Name": "Clumsy",
         "Description": "-[value] to DEX checks and DCs (AC, Reflex, Ranged attack rolls, skills, etc.)",
         "hasValue": true,
-        "statusMarker": "6042737:clumsy"
+        "statusMarker": "6042737:clumsy",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604570/7uFzFVa5Vqf9CCB8D36pnw/max.png?1690123453"
     },
     "Concealed": {
         "Name": "Concealed",
         "Description": "Requires DC 5 flat check to be targeted with attack, spell, or other effect.",
         "hasValue": false,
-        "statusMarker": "6042738:concealed"
+        "statusMarker": "6042738:concealed",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604550/0PTYWEbfGHvjX2wz6c-bbQ/max.png?1690123452"
     },
     "Confused": {
         "Name": "Confused",
         "Description": "Flat-footed, can't benefit from flanking, can't Delay or Ready, can't use Reactions. All actions must be spent on Strikes or offensive Cantrips against a random target determined by the GM. If there are no targets, you target yourself, automatically hitting. Each time you take damage, you get a flat DC 11 check to overcome the confusion.",
         "hasValue": false,
-        "statusMarker": "6042739:confused"
+        "statusMarker": "6042739:confused",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604551/3wiom1UFhhPskoYLZJqa_w/max.png?1690123452"
     },
     "Dazzled": {
         "Name": "Dazzled",
         "Description": "If vision is only precise sense, all creatures and objects are Concealed (DC 5 flat check to target).",
         "hasValue": false,
-        "statusMarker": "6042741:dazzled"
+        "statusMarker": "6042741:dazzled",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604541/Rp5BeOQE8KJcNdBjV8UZSw/max.png?1690123452"
     },
     "Deafened": {
         "Name": "Deafened",
         "Description": "Can't hear. -2 Perception for Initiative. Actions with 'Auditory' trait require DC 5 flat check. Immune to auditory effects.",
         "hasValue": false,
-        "statusMarker": "6042742:deafened"
+        "statusMarker": "6042742:deafened",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604555/P5y1PY62Ysp1nrOT-q6l7g/max.png?1690123452"
     },
     "Doomed": {
         "Name": "Doomed",
         "Description": "Dying needed to die decreased by [value] (a creature with Doomed 2 would die at Dying 2 instead of Dying 4). Doomed value decreases by 1 with each rest.",
         "hasValue": true,
-        "statusMarker": "6042743:doomed"
+        "statusMarker": "6042743:doomed",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604548/NnBkvjbkvtY-X43HqD9vZg/max.png?1690123452"
     },
     "Drained": {
         "Name": "Drained",
         "Description": "-[value] to CON checks (such as Fortitude). Lose current and max HP equal to level times [value]. Doesn't count as taking damage. Drained value decreases by 1 with each rest.",
         "hasValue": true,
-        "statusMarker": "6042744:drained"
+        "statusMarker": "6042744:drained",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604565/lf9rDCfLKV_5gyF1g8pKjw/max.png?1690123452"
     },
     "Encumbered": {
         "Name": "Encumbered",
@@ -59,55 +67,64 @@ const conditions = {
         "Name": "Enfeebled",
         "Description": "-[value] to STR checks and DCs (such as melee attacks, damage, Athletics).",
         "hasValue": true,
-        "statusMarker": "6042747:enfeebled"
+        "statusMarker": "6042747:enfeebled",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604536/aXhzaEiJp238Op8HTa4RsA/max.png?1690123452"
     },
     "Fascinated": {
         "Name": "Fascinated",
         "Description": "-2 Perception and skill checks. Can't use 'concentrate' actions unless they are related to the subject of the fascination. This condition ends if any creature uses hostile actions against you or any of your allies.",
         "hasValue": false,
-        "statusMarker": "6042748:fascinated"
+        "statusMarker": "6042748:fascinated",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604526/UKa6FsMc-TJMdHn3phjHTQ/max.png?1690123452"
     },
     "Fatigued": {
         "Name": "Fatigued",
         "Description": "-1 to AC and saves. Can't use exploration activities while traveling. Recover with one rest.",
         "hasValue": false,
-        "statusMarker": "6042750:fatigued"
+        "statusMarker": "6042750:fatigued",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604538/bmcqiyIX3xd7XC7fGhScsQ/max.png?1690123452"
     },
     "Fleeing": {
         "Name": "Fleeing",
         "Description": "All actions must be spent escaping the source (usually the caster) of the condition. Can't Delay or Ready.",
         "hasValue": false,
-        "statusMarker": "6042755:fleeing"
+        "statusMarker": "6042755:fleeing",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604531/D5bTcPXKCggj7GvYQpDsBA/max.png?1690123452"
     },
     "Frightened": {
         "Name": "Frightened",
         "Description": "-[value] to all checks and DCs. Unless otherwise specified, Frightened value decreases by 1 at end of each of your turns.",
         "hasValue": true,
-        "statusMarker": "6042757:frightened"
+        "statusMarker": "6042757:frightened",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604543/dRAFXaQVqYQpuySkCTbyBQ/max.png?1690123452"
     },
     "Grabbed": {
         "Name": "Grabbed",
         "Description": "Flat-footed and immobilized (can't use actions with 'Move' trait). Actions with 'Manipulate' trait require DC 5 flat check.",
         "hasValue": false,
-        "statusMarker": "6042760:grabbed"
+        "statusMarker": "6042760:grabbed",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604552/j8KIGD4c4ReemdeEyR5asw/max.png?1690123452"
     },
     "Immobilized": {
         "Name": "Immobilized",
         "Description": "Can't use actions with 'Move' trait. If something would force you to move, the force must succeed against the DC of the immobilizing source (spell DC or Athletics DC)",
         "hasValue": false,
-        "statusMarker": "6042764:immobilised"
+        "statusMarker": "6042764:immobilised",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604528/BRCvjOhUvPc9_5ahC6416g/max.png?1690123452"
     },
     "Invisible": {
         "Name": "Invisible",
         "Description": "Creatures can't target you and have no idea what space you occupy. Creatures can use Seek action against your Stealth DC to identify what space you're in (allowing a DC 11 flat check to target you).",
         "hasValue": false,
-        "statusMarker": "6042767:invisible"
+        "statusMarker": "6042767:invisible",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604562/Xm2ph4b59MdUUx9G_hNM2Q/max.png?1690123452"
     },
     "Paralyzed": {
         "Name": "Paralyzed",
         "Description": "Flat-footed. Can't act except to Recall Knowledge or other actions that require only the use of your mind (as determined by GM).",
         "hasValue": false,
-        "statusMarker": "6042769:paralysed"
+        "statusMarker": "6042769:paralysed",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604560/tCCEKGaPkJJpJP24KAlkeQ/max.png?1690123452"
     },
     "Persistent": {
         "Name": "Persistent",
@@ -218,55 +235,64 @@ const conditions = {
         "Name": "Petrified",
         "Description": "Can't act or sense anything. Has AC 9, Hardness 8.",
         "hasValue": false,
-        "statusMarker": "6042771:petrified"
+        "statusMarker": "6042771:petrified",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604567/b9HxvOAfHJw5Im28L3n2lw/max.png?1690123452"
     },
     "Prone": {
         "Name": "Prone",
         "Description": "Flat-footed and -2 to attack rolls. Only move actions available are Crawl and Stand. You can Take Cover while pron to gain greater cover (+4 AC) against ranged attacks",
         "hasValue": false,
-        "statusMarker": "6042773:prone"
+        "statusMarker": "6042773:prone",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604524/o6w7AXMerLDb3Uq2Ebb0Cw/max.png?1690123452"
     },
     "Quickened": {
         "Name": "Quickened",
         "Description": "Gain 1 extra action at start of each turn.",
         "hasValue": false,
-        "statusMarker": "6042776:quickened"
+        "statusMarker": "6042776:quickened",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604563/G58j8ywGGMsCCoqSvAD_dQ/max.png?1690123452"
     },
     "Restrained": {
         "Name": "Restrainted",
         "Description": "Flat-footed and immobilized (can't use actions with 'Move' trait). Can't use 'Attack' or 'Manipulate' actions except to Escape or Force Open your bonds. Overrides Grabbed.",
         "hasValue": false,
-        "statusMarker": "6042778:restrained"
+        "statusMarker": "6042778:restrained",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604553/EsLplJb5XClMrzHOR_hw8g/max.png?1690123452"
     },
     "Sickened": {
         "Name": "Sickened",
         "Description": "-[value] to all checks and DCs. Can't willingly ingest anything (including elixirs and potions). Can spend 1 action retching to attempt a FORT save against the effect DC to reduce Sickened value by 1 (or 2 on a crit success).",
         "hasValue": true,
-        "statusMarker": "6042781:sickened"
+        "statusMarker": "6042781:sickened",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604564/1xjBP9MFSd6kOUtjfCl77g/max.png?1690123452"
     },
     "Slowed": {
         "Name": "Slowed",
         "Description": "Regain [value] fewer actions than normal at start of turn.",
         "hasValue": true,
-        "statusMarker": "6042783:slowed"
+        "statusMarker": "6042783:slowed",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604534/KmFhZcSJo9Y92BWOI_-zBA/max.png?1690123452"
     },
     "Stunned_Actions": {
         "Name": "Stunned_Actions",
         "Description": "Lose [value] actions, possibly over multiple turns. Overrides Slowed.",
         "hasValue": true,
-        "statusMarker": "6042785:stunned"
+        "statusMarker": "6042785:stunned",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604537/U2u49CbG18B0oZloYHH6Qg/max.png?1690123452"
     },
     "Stunned_Duration": {
         "Name": "Stunned_Duration",
         "Description": "Unable to take actions for the duration. Overrides Slowed.",
         "hasValue": false,
-        "statusMarker": "6042785:stunned"
+        "statusMarker": "6042785:stunned",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604537/U2u49CbG18B0oZloYHH6Qg/max.png?1690123452"
     },
     "Stupefied": {
         "Name": "Stupefied",
         "Description": "-[value] to all mental checks and DCs (Will saves, spell attack rolls, spell DCs, skills, etc). Casting a spell requires flat check against DC 5 + stupefied value.",
         "hasValue": true,
-        "statusMarker": "6042787:stupefied"
+        "statusMarker": "6042787:stupefied",
+        "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604556/Eg4_gmTfNSMP53sLwdpjqg/max.png?1690123452"
     }
 }
 
