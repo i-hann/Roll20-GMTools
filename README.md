@@ -27,5 +27,11 @@ Treating Bar 3 as HP, any token that drops to 0 HP or lower will trigger a Death
 ### HP Tinting
 Treating Bar 3 as HP, any token that drops below 50% HP will be tinted on a gradient of yellow -> orange -> red until they hit 0.
 
-### Conditions-Add
-Add a condition ("Slowed", "Paralyzed", etc.) to one or more selected tokens. This puts an appropriate status marker on the token (requires import of custom status markers) and also stores the full status data in the token's GM notes. For conditions that require additional parameters such as Value (ex. Slowed "2") and/or Type (ex. Persistent "Fire"), a button is provided in the chat for the user to provide the parameters.
+### Conditions-Add (Macro - Token Action)
+Add a condition ("Slowed", "Paralyzed", etc.) to one or more selected tokens. This puts an appropriate status marker on the token (requires import of custom status markers) and also stores the full status data in the token's GM notes. For conditions that require additional parameters such as Value (ex. Slowed "2") and/or Type (ex. Persistent "Fire"), a button is provided in the chat for the user to provide the parameters. An UNDO button is also provided to undo the addition of the condition by this macro.
+
+### Conditions-Show (Macro - Token Action)
+Display a table of all of the conditions affecting a single token. For each condition, a button is also provided to remove it.
+
+### Exploration Activities (Macros for player and GM)
+Players can use the command "!exploration" to change what Exploration Activity their character is performing. The GM can use the command "!exploration display" to show a summary of the party's exploration activities in the chat. Both of these can be macros.
