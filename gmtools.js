@@ -396,6 +396,13 @@ async function resetGMMacros(gm_id) {
                 visibleto: gm_id,
                 action: '!conditions show',
                 istokenaction: true
+            },
+            {
+                name: "Exploration",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!exploration display',
+                istokenaction: false
             }
 
         ];
@@ -1574,10 +1581,10 @@ async function ExplorationShowChoices(playerId) {
     }
 }
 
-/* Function to take a player's choice of Exploration Activity
-   and store it as data in the 'Exploration' Handout
+/* Function to take a player's choice of Exploration Activity and store it as data in the 'Exploration' Handout
+   The handout gets locked when changes are being applied, to prevent multiple players from editing at the same time.
 */
-async function ExplorationChoose(arg) {
+async function ExplorationChoose(arg, retryCount) {
     try {
         // Parse the argument
         // arg ex: !exploration choose speakingAs activityName
@@ -1599,21 +1606,41 @@ async function ExplorationChoose(arg) {
                 const handout = handoutObjs[0];
                 handout.get('gmnotes', (gmnotes) => {
 
-                    const r = new RegExp(`\\[${speakingAs}:(.*?)\\]`);
-                    const matches = gmnotes.match(r);
-                    if (matches) {
-                        // Replace old role with new one
-                        gmnotes = gmnotes.replace(matches[1], activityName);
+                    // If it's locked, retry 100ms later (Stop trying after 20 attempts)
+                    if (gmnotes.match(/^LOCKED/)) {
+                        if (retryCount < 10) {
+                            retryCount++;
+                            setTimeout(() => {
+                                ExplorationChoose(arg, retryCount);
+                            }, 100);
+                        } else {
+                            log("gmtools.js: ExplorationChoose: Giving up after retry counter reached " + retryCount);
+                            sendChat("gmtools.js", `ExplorationChoose: Giving up after retry counter reached ${retryCount}`);
+                        }
+
                     } else {
-                        // Or add role
-                        gmnotes = gmnotes + `[${speakingAs}:${activityName}]`;
+                        // If it's not locked, lock it and proceed
+                        var lockedGmNotes = "LOCKED" + gmnotes;
+                        handout.set('gmnotes', lockedGmNotes);
+
+                        const r = new RegExp(`\\[${speakingAs}:(.*?)\\]`);
+                        const matches = gmnotes.match(r);
+                        if (matches) {
+                            // Replace old role with new one
+                            gmnotes = gmnotes.replace(matches[0], `[${speakingAs}:${activityName}]`);
+                        } else {
+                            // Or add role
+                            gmnotes = gmnotes + `[${speakingAs}:${activityName}]`;
+                        }
+
+                        // Set new gmnotes
+                        handout.set('gmnotes', gmnotes);
+
+                        // Log to chat
+                        sendChat(characterName, `/desc changed their Exploration Activity to ${activityName}.`);
                     }
 
-                    // Set new gmnotes
-                    handout.set('gmnotes', gmnotes);
 
-                    // Log to chat
-                    sendChat(characterName, `/desc changed their Exploration Activity to ${activityName}.`);
                 });
 
             } else {
@@ -1644,10 +1671,118 @@ async function ExplorationDisplay() {
             const handout = handoutObjs[0];
             handout.get('gmnotes', async (gmnotes) => {
 
-                // TBD
+                // Parse gmnotes into an array of id:activity pairs
+                gmnotes = gmnotes.replace(/\]\s*\[/g, "@");
+                gmnotes = gmnotes.replace("[", "");
+                gmnotes = gmnotes.replace("]", "");
+                var idActivityPairs = gmnotes.split("@");
 
+                // Convert id:activity pairs to name:activity pairs
+                var characterActivityPairs = [];
+                await Promise.all(idActivityPairs.map(async (pair) => {
+                    const split = pair.split(":");
+                    const id = split[0];
+                    const activity = split[1];
+                    const characterObj = await getObj('character', id);
+                    const characterName = await characterObj.get('name');
+                    characterActivityPairs.push(`${characterName}:${activity}`);
+                }));
+                
+                // Map exploration activities to character names
+                // ex:  { Scout: [ 'Bob', 'Joe' ], Defend: [ 'Jim' ], Investigate: [ 'John' ] }
+                var activityToCharactersMap = {};
+                _.each(characterActivityPairs, (str) => {
+                    const [id, activity] = str.split(":");
+                    if (!activityToCharactersMap[activity]) {
+                        activityToCharactersMap[activity] = [];
+                    }
+                    activityToCharactersMap[activity].push(id);
+                });
 
+                // Build final array of objects to be used for table
+                var tableActivities = [];
+                _.each(exploration_activities, (activity) => {
+                    const { Name, Description } = activity;
+                    if (activityToCharactersMap[Name]) {
+                        tableActivities.push({
+                            Name,
+                            Description,
+                            Characters: activityToCharactersMap[Name]
+                        });
+                    }
+                });
 
+                /* Example tableActivities:
+                 * [
+                        {
+                        "Name":"Investigate",
+                        "Description":"Use Recall Knowledge to discover clues among the various things you see and engage with.",
+                        "Characters":["Cawlo"]
+                        },
+                        {
+                        "Name":"Search",
+                        "Description":"Repeatedly roll Perception to spot hidden doors, traps, and hazards.",
+                        "Characters":["Marshu","Richard"]
+                        }
+                    ]
+                */
+
+                // Build table
+                const tableData = {
+                    style: "width:100%; border: 1px solid purple",
+                    headers: [
+                        {
+                            name: `Exploration Activities`,
+                            style: "background-color:purple; color:white; padding:8px; font-size:25px",
+                            align: "center",
+                            colspan: "1"
+                        }
+                    ],
+                    columns: [],
+                    rows: []
+                }
+                await Promise.all(tableActivities.map(async (activity) => {
+                    var nameString = '';
+                    _.each(activity.Characters, (name) => {
+                        if (nameString == '') {
+                            nameString = name;
+                        } else {
+                            nameString = nameString + `, ${name}`;
+                        }
+                    })
+                    var firstRow = [];
+                    firstRow.push({
+                        "string": `<b>${activity.Name}</b>`,
+                        "style": "padding:5px; text-align: left; background-color: purple; color:white",
+                        "colspan": "1",
+                        "width": "100%"
+                    });
+                    var secondRow = [];
+                    secondRow.push({
+                        "string": `<b>${nameString}</b>`,
+                        "style": "padding:5px; text-align: left",
+                        "colspan": "1",
+                        "width": "100%"
+                    });
+
+                    var thirdRow = [];
+                    thirdRow.push({
+                        "string": activity.Description,
+                        "style": "padding:5px; text-align: left; border-bottom: 1px solid purple",
+                        "colspan": "1",
+                        "width": "100%"
+                    });
+
+                    tableData.rows.push(firstRow);
+                    tableData.rows.push(secondRow);
+                    tableData.rows.push(thirdRow);
+                }));
+
+                // Create Table
+                const table = await HTMLBuilder(tableData);
+
+                // Display it
+                sendChat("gmtools.js", table);
 
             });
 
@@ -1787,7 +1922,7 @@ on('ready', async function () {
 
             // Player chooses an Exploration Activity (called by button)
             if ((msg.content.match(/^!exploration choose/i))) {
-                ExplorationChoose(msg.content);
+                ExplorationChoose(msg.content, 0);
             }
 
             // Display Exploration Activity (GM Only, called with macro)
