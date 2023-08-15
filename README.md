@@ -35,3 +35,6 @@ Display a table of all of the conditions affecting a single token. For each cond
 
 ### Exploration Activities (Macros for player and GM)
 Players can use the command "!exploration" to change what Exploration Activity their character is performing. The GM can use the command "!exploration display" to show a summary of the party's exploration activities in the chat. Both of these can be macros.
+
+### Tension Pool
+The Tension Pool is a system-agnostic supplement for any tabletop rpg where you want your players to care more about the time they're wasting within a dungeon. The "Tension" macro displays the current Tension, with buttons for Reckless Behavior, Time Consumption, and Clear. To read more about how the Tension Pool works, you can go here: https://theangrygm.com/definitive-tension-pool/

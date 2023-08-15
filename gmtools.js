@@ -1,11 +1,7 @@
-/*
-exploration activities notes
 
-player sends message
-script grabs "Speaking As:" name, and player ID, from the message
-script checks roll20 journal for exactly one entry with same name as "Speaking As":
-script verifies the entry has "ControlledBy" equal to player ID
-*/
+
+// Tension imgsrc
+const tension_imgsrc = "https://s3.amazonaws.com/files.d20.io/images/354795605/aLymHd04vGUnZ-0FpMtC2Q/max.png?1692124399";
 
 // Exploration Activities
 const exploration_activities = [
@@ -402,6 +398,13 @@ async function resetGMMacros(gm_id) {
                 _playerid: gm_id,
                 visibleto: gm_id,
                 action: '!exploration display',
+                istokenaction: false
+            },
+            {
+                name: "Tension",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!tension show',
                 istokenaction: false
             }
 
@@ -1797,6 +1800,188 @@ async function ExplorationDisplay() {
     }
 }
 
+async function tensionShow() {
+    try {
+        // Find Handout obj
+        const handoutObjs = await findObjs({
+            _type: 'handout',
+            name: 'Tension'
+        });
+        if ((typeof handoutObjs != 'undefined') && (handoutObjs.length == 1)) {
+            // Unique 'Tension' handout found
+            const handout = handoutObjs[0];
+            handout.get('gmnotes', async (gmnotes) => {
+
+                const regex = /([0-5])/i;
+                const matches = gmnotes.match(regex);
+                if (matches) {
+                    var currentTension = parseInt(matches[1]);
+
+                    // Build display table
+                    var tableData = {
+                        style: "width:100%; border: 1px solid black",
+                        headers: [
+                            {
+                                name: `TENSION: ${currentTension}`,
+                                style: "background-color:black; color:white; padding:8px; font-size:30px",
+                                align: "center",
+                                colspan: "3"
+                            }
+                        ],
+                        columns: [],
+                        rows: []
+                    };
+
+                    const skullEmoji = `<img src=${tension_imgsrc} height="25" width="25"> `
+
+                    var emojiString = '';
+                    for (var i = 0; i < currentTension; i++) {
+                        emojiString = emojiString + ' ' + skullEmoji;
+                    }
+
+                    var firstRow = [];
+                    firstRow.push({
+                        "string": emojiString,
+                        "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:20px",
+                        "colspan": "3",
+                        "width": "100%"
+                    });
+                    (tableData.rows).push(firstRow);
+
+                    var secondRow = [];
+                    secondRow.push({
+                        "string": `[RECKLESS BEHAVIOR](!tension roll ${currentTension})`,
+                        "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:14px",
+                        "colspan": "1",
+                        "width": "33%"
+                    });
+
+                    secondRow.push({
+                        "string": `[TIME CONSUMPTION](!tension add ${currentTension} ?{Increase Tension})`,
+                        "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:14px",
+                        "colspan": "1",
+                        "width": "33%"
+                    });
+
+                    secondRow.push({
+                        "string": "[CLEAR](!tension clear)",
+                        "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:14px",
+                        "colspan": "1",
+                        "width": "33%"
+                    });
+
+                    (tableData.rows).push(secondRow);
+
+
+
+                    const table = await HTMLBuilder(tableData, true);
+
+                    sendChat("gmtools.js", table);
+
+
+                } else {
+                    log("tensionShow: Error: Tension handout contains characters outside of '0 - 5'.");
+                    sendChat("gmtools.js", "tensionShow: Error: Tension handout contains characters outside of '0 - 5'.");
+                }
+            });
+
+        } else {
+            // Unique 'Tension' handout not found
+            log("tensionShow: Error: Failed to find a singular Tension handout (check for absence or duplicates)");
+            sendChat("gmtools.js", "tensionShow: Error: Failed to find a singular Tension handout (check for absence or duplicates)");
+        }
+
+    } catch (err) {
+        log("tensionShow: Error: " + err.message);
+        sendChat("gmtools.js", "tensionShow: Error: " + err.message);
+    }
+}
+
+async function tensionRoll(currentTension) {
+    try {
+        // For each point of tension, roll a d6. If any land on 1, something bad happens.
+        var results = [];
+        var somethingBadHappens = false;
+        for (let i = 0; i < currentTension; i++) {
+            var roll = randomInteger(6);
+            if (roll == 1) {
+                somethingBadHappens = true;
+            }
+            results.push(roll);
+        }
+        var resultString = '';
+        var firstResult = true;
+        for (let i = 0; i < results.length; i++) {
+            if (firstResult) {
+                resultString = resultString + `${results[i]}`;
+                firstResult = false;
+            } else {
+                resultString = resultString + `, ${results[i]}`;
+            }
+        }
+
+        sendChat("Tension", "/desc results: " + resultString);
+
+        if (somethingBadHappens) {
+            sendChat("SOMETHING", "/desc BAD HAPPENS...");
+        }
+        
+
+    } catch (err) {
+        log("gmtools.js: tensionRoll: Error: " + err.message);
+        sendChat("gmtools.js", "tensionRoll: Error: " + err.message);
+    }
+}
+
+async function tensionAdd(currentTension, addAmount) {
+    try {
+        // Convert to int
+        const currentInt = parseInt(currentTension);
+        const addInt = parseInt(addAmount);
+        if ((typeof addInt != 'undefined') && (typeof currentInt != 'undefined')) {
+            var newTension = currentInt + addInt;
+            if (newTension >= 6) {
+                sendChat("Tension", "/desc hit 6!");
+                tensionRoll(6);
+                tensionClear();
+            } else {
+                // Find Handout obj
+                const handoutObjs = await findObjs({
+                    _type: 'handout',
+                    name: 'Tension'
+                });
+                const handout = handoutObjs[0];
+                // Set new tension
+                sendChat("Tension", "/desc increased to " + newTension + "!");
+                handout.set("gmnotes", newTension);
+            }
+        }
+    } catch (err) {
+        log("tensionAdd: Error: " + err.message);
+        sendChat("gmtools.js", "tensionAdd: Error: " + err.message);
+    }
+}
+
+async function tensionClear() {
+    try {
+        // Find Handout obj
+        const handoutObjs = await findObjs({
+            _type: 'handout',
+            name: 'Tension'
+        });
+        if ((typeof handoutObjs != 'undefined') && (handoutObjs.length == 1)) {
+            // Unique 'Tension' handout found
+            const handout = handoutObjs[0];
+            handout.set('gmnotes', '0');
+            sendChat("Tension", "/desc cleared to 0.");
+        }
+
+    } catch (err) {
+        log("tensionClear: Error: " + err.message);
+        sendChat("gmtools.js", "tensionClear: Error: " + err.message);
+    }
+}
+
 
 on('ready', async function () {
     "use strict";
@@ -1928,6 +2113,34 @@ on('ready', async function () {
             // Display Exploration Activity (GM Only, called with macro)
             if ((msg.content.match(/^!exploration display/i)) && (playerIsGM(msg.playerid))) {
                 ExplorationDisplay();
+            }
+
+            // Show Tension Pool (GM Only, called with macro)
+            if ((msg.content.match(/^!tension show/i)) && (playerIsGM(msg.playerid))) {
+                tensionShow();
+            }
+
+            // Tension - Reckless Behavior Button
+            if ((msg.content.match(/^!tension roll [1-6]/i)) && (playerIsGM(msg.playerid))) {
+                var tensionRollRegex = /([1-6])/;
+                var tensionRollMatches = msg.content.match(tensionRollRegex);
+                if (tensionRollMatches) {
+                    tensionRoll(tensionRollMatches[1]);
+                }
+            }
+
+            // Tension - Time Consumption Button
+            if ((msg.content.match(/^!tension add/i)) && (playerIsGM(msg.playerid))) {
+                var addRegex = /([0-5])\s([0-9]*)/;
+                var addMatches = msg.content.match(addRegex);
+                if (addMatches) {
+                    tensionAdd(addMatches[1], addMatches[2]);
+                }
+            }
+
+            // Tension - Clear Button
+            if ((msg.content.match(/^!tension clear/i)) && (playerIsGM(msg.playerid))) {
+                tensionClear();
             }
 
         } catch (err) {
