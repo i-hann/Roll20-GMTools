@@ -1986,14 +1986,14 @@ async function tensionClear() {
 on('ready', async function () {
     "use strict";
 
-    // 25 HP Tint colors which each corresponds to a 2% window (ex: 1-2%, 3-4%, etc.)
+    // 25 HP Tint colors which each correspond to a 2% window from 1% HP to 50% HP (ex: 1-2%, 3-4%, etc.)
     // red -> orange -> yellow
     const hpTints = [
-        "#850101", "#8d1201", "#951f00", "#9d2900", "#a53400",
-        "#ac3d00", "#b34700", "#ba5100", "#c15a00", "#c76400", 
-        "#cd6d00", "#d37700", "#d98100", "#de8b00", "#e39500", 
-        "#e79f00", "#ecaa00", "#efb400", "#f3be00", "#f6c900",  
-        "#f9d400", "#fbde00", "#fde900", "#fef400", "#ffff04"
+        "#ff0202", "#ff2500", "#ff3700", "#ff4500", "#ff5100",
+        "#ff5c00", "#ff6700", "#ff7100", "#ff7a00", "#ff8300",
+        "#ff8c00", "#ff9500", "#ff9e00", "#ffa600", "#ffae00",
+        "#ffb600", "#ffbe00", "#ffc600", "#ffce00", "#ffd600", 
+        "#ffde00", "#ffe500", "#ffed00", "#fff500", "#fffc00"
     ]
 
     // Load DeathSfx Playlist
