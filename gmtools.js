@@ -134,7 +134,7 @@ const conditions = {
     },
     "Frightened": {
         "Name": "Frightened",
-        "Description": "-[value] to all checks and DCs. Unless otherwise specified, Frightened value decreases by 1 at end of each of your turns.",
+        "Description": "-[value] to all checks and DCs, including AC. Unless otherwise specified, Frightened value decreases by 1 at end of each of your turns.",
         "hasValue": true,
         "statusMarker": "6042757:frightened",
         "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604543/dRAFXaQVqYQpuySkCTbyBQ/max.png?1690123452"
@@ -302,7 +302,7 @@ const conditions = {
     },
     "Sickened": {
         "Name": "Sickened",
-        "Description": "-[value] to all checks and DCs. Can't willingly ingest anything (including elixirs and potions). Can spend 1 action retching to attempt a FORT save against the effect DC to reduce Sickened value by 1 (or 2 on a crit success).",
+        "Description": "-[value] to all checks and DCs, including AC. Can't willingly ingest anything (including elixirs and potions). Can spend 1 action retching to attempt a FORT save against the effect DC to reduce Sickened value by 1 (or 2 on a crit success).",
         "hasValue": true,
         "statusMarker": "6042781:sickened",
         "imgsrc": "https://s3.amazonaws.com/files.d20.io/images/351604564/1xjBP9MFSd6kOUtjfCl77g/max.png?1690123452"
@@ -1325,7 +1325,7 @@ async function addCondition(arg) {
     }
 }
 
-/* Function to take string argument from a button and 
+/* Function to take string argument from a button and remove a poison
 Ex arg:  !conditions remove Name@Stunned(Duration) tokenIds@-NYn7O6o8eKzweLP1YBC@-NYin6YnQrDwvrx2h1GO Value@None
 
 */
@@ -1401,10 +1401,14 @@ async function showConditions(selectedToken) {
         const tokenName = await tokenObj.get('name');
         const gmNotes = await tokenObj.get('gmnotes');
 
-        // Parse conditions from gm notes into conditionsArray (an array of condition objects)
-        var gmNotesArray = await gmNotes.split("] [");
+        // Parse conditions from gm notes into conditionsArray (an array of condition objects) and poisonsArray (an array of poison objects)
+        const breakpoint = /\].*?\[/
+        var gmNotesArray = await gmNotes.split(breakpoint);
         var conditionsArray = [];
+        var poisonsArray = [];
+
         await Promise.all(gmNotesArray.map(async (conditionString) => {
+
             conditionString = conditionString.replace("[", "");
             conditionString = conditionString.replace("]", "");
 
@@ -1412,11 +1416,15 @@ async function showConditions(selectedToken) {
             //                     condition:Persistent_Positive value:3
             //                     condition:Persistent_Slashing value:8
             //                     condition:Persistent_Fire value:10
+            //                     poison:Giant Centipede Venom stage:1
 
             const nameRgx = /condition\:(.*?)\s+/i;
             const nameMatches = conditionString.match(nameRgx);
             const valueRgx = /value\:([0-9]*)/i;
             const valueMatches = conditionString.match(valueRgx);
+
+            const poisonRgx = /poison\:(.*?)\s*stage\:([0-9]*)/i;
+            const poisonMatches = conditionString.match(poisonRgx);
 
             var conditionValue = 'None';
             if (valueMatches) {
@@ -1431,11 +1439,16 @@ async function showConditions(selectedToken) {
                 } else {
                     log(`gmtools.js: showConditions: ERROR: Unexpected condition name: '${nameMatches[1]}' in gmnotes for token: '${tokenName}'`);
                 }
-
+            } else if (poisonMatches) {
+                var poisonObj = {
+                    "Name": poisonMatches[1],
+                    "Stage": poisonMatches[2]
+                };
+                poisonsArray.push(poisonObj);
             }
         }));
 
-        // Create table from conditionsArray
+        // Create table starting with conditionsArray
         var tableData = {
             style: "width:100%; border: 1px solid purple",
             headers: [
@@ -1506,6 +1519,53 @@ async function showConditions(selectedToken) {
             (tableData.rows).push(secondRow);
         }));
 
+
+        // Then add poisons to the table
+        await Promise.all(poisonsArray.map(async (poisonObj) => {
+            /* Example poison obj:
+               {
+                   "Name": "Giant Centipede Venom"
+                   "Stage": "2"
+               }
+            */
+
+            // First Row: Left side is poison name, right side is remove button
+            var firstRow = [];
+            var imgString = `<img src="${conditions["Persistent_Poison"].imgsrc}" width="18" height="18"> `;
+            const removeButton = `[REMOVE](!poison remove Name@${poisonObj.Name} tokenIds@${selectedToken._id})`;
+
+            firstRow.push({
+                "string": `${imgString}<b>${poisonObj.Name}</b>`,
+                "style": "padding:5px; text-align: left",
+                "colspan": "1",
+                "width": "85%"
+            });
+
+            firstRow.push({
+                "string": removeButton,
+                "style": "padding:5px; text-align: right; font-size:10px",
+                "colspan": "1",
+                "width": "15%"
+            });
+
+            // Second Row: Stage #, followed by Advance button
+            var secondRow = [];
+            var stage = poisonObj.Stage;
+            const advanceButton = `[ADVANCE](!poison advance Name@${poisonObj.Name} Stage@${poisonObj.Stage} tokenIds@${selectedToken._id})`;
+            var stageString = `Stage ${stage}   ${advanceButton}`;
+
+            secondRow.push({
+                "string": stageString,
+                "style": "padding:5px; text-align: left; border-bottom: 1px solid purple",
+                "colspan": "1",
+                "width": "100%"
+            });
+
+            (tableData.rows).push(firstRow);
+            (tableData.rows).push(secondRow);
+
+        }));
+
         const table = await HTMLBuilder(tableData, true);
 
         sendChat("gmtools.js", table);
@@ -1543,9 +1603,8 @@ async function addPoison(selectedTokens, msg) {
                 // Check if poison is already there
                 const rgx = new RegExp(`\\[poison\\:${poisonName}`, "i");
                 if (currentGmNotes.match(rgx)) {
-                    // It's there - check if it's the same stage
-
-                    // TBD
+                    // It's already there - do nothing
+                    sendChat("gmtools.js", `${tokenName} is already afflicted with ${poisonName}.`)
 
                 } else {
                     // It's not there - add new poison to the gm notes
@@ -1565,20 +1624,112 @@ async function addPoison(selectedTokens, msg) {
                     }
 
                     // And announce that we have added the poison
-                    sendChat("gmtools.js", `/desc ${poisonName} applied to ${tokenName}.`)
-
+                    sendChat("gmtools.js", `'${poisonName}' applied to ${tokenName}.`)
                 }
-
-
             }));
-
         }
-
-
-
     } catch (err) {
         log("addPoison: Error: " + err.message);
         sendChat("gmtools.js", "addPoison: Error: " + err.message);
+    }
+}
+
+/* Function to take string argument from a button and remove a poison
+Ex arg:  !poison remove Name@Giant Centipede Venom tokenIds@-NYn7O6o8eKzweLP1YBC@-NYin6YnQrDwvrx2h1GO
+
+*/
+async function removePoison(arg) {
+    try {
+        // Parse argument string
+        const regexp = /^!poison\s*remove\s*Name\@(.*?)\s*tokenIds\@(.*?)\s*$/i;
+        const matches = arg.match(regexp);
+        if (matches) {
+            const poisonName = matches[1];
+            const tokenIdsString = matches[2];
+            const tokenIds = tokenIdsString.split('@');
+
+            // Loop through tokens
+            _.each(tokenIds, async (tokenId) => {
+                // Get token properties
+                const tokenObj = await getObj('graphic', tokenId);
+                const tokenName = await tokenObj.get('name');
+                const currentGmNotes = await tokenObj.get('gmnotes');  // ex:  [condition:Slowed value:1] [poison:Giant Centipede Venom stage:2]
+
+                // Remove from gmnotes
+                const rgx = new RegExp(`\\[poison\\:${poisonName}\\sstage\\:[0-9]*\\]`, "i");
+                var newGmNotes = currentGmNotes.replace(rgx, "");
+                await tokenObj.set('gmnotes', newGmNotes);
+
+
+                // Remove status marker if no other poisons are afflicting the token
+                // For some reason, adding custom imported statusmarker uses convention "6042737:clumsy", but removing uses "clumsy::6042737"
+                // This seems like a bug. In case it gets fixed in the future, we will account for both conventions
+                const r = new RegExp(`poison`, "i");
+                if (!newGmNotes.match(r)) {
+                    const statusA = conditions["Persistent_Poison"].statusMarker;
+                    const parts = statusA.split(":");
+                    const statusB = parts[1] + "::" + parts[0];
+                    tokenObj.set(`status_${statusA}`, false);
+                    tokenObj.set(`status_${statusB}`, false);
+                }
+
+                // Log the removal
+                log(`gmtools.js: removePoison: Removed ${poisonName} from ${tokenName}`);
+                sendChat("gmtools.js", `Removed '${poisonName}' from ${tokenName}`);
+
+            });
+        }
+
+
+    } catch (err) {
+        log("removeCondition: Error: " + err.message);
+        sendChat("gmtools.js", "removeCondition: Error: " + err.message);
+    }
+}
+
+async function advancePoison(arg) {
+    try {
+        // Parse argument string
+        const regexp = /^!poison\s*advance\s*Name\@(.*?)\s*Stage@([0-9]*?)\s*tokenIds\@(.*?)\s*$/i;
+        const matches = arg.match(regexp);
+        if (matches) {
+            // Map arg data
+            const poisonName = matches[1];
+            const oldStage = matches[2];
+            const tokenIdsString = matches[3];
+
+            const tokenIds = tokenIdsString.split('@');
+
+            // Calc new stage
+            var oldStageNumber = await parseInt(oldStage);
+            var newStage = oldStageNumber + 1;
+
+            // Loop through tokens
+            _.each(tokenIds, async (tokenId) => {
+                // Get token properties
+                const tokenObj = await getObj('graphic', tokenId);
+                const tokenName = await tokenObj.get('name');
+                const currentGmNotes = await tokenObj.get('gmnotes');  // ex:  [condition:Slowed value:1] [poison:Giant Centipede Venom stage:2]
+
+                // Create new data
+                const newPoison = `[poison:${poisonName} stage:${newStage}]`
+
+                // Replace old poison data with new poison data
+                const rgx = new RegExp(`\\[poison\\:${poisonName}\\sstage\\:${oldStage}\\]`, "i");
+                var newGmNotes = currentGmNotes.replace(rgx, newPoison);
+                await tokenObj.set('gmnotes', newGmNotes);
+
+                // Log the advance
+                log(`gmtools.js: advancePoison: Advanced ${poisonName} on ${tokenName} to Stage ${newStage}`);
+                sendChat("gmtools.js", `Advanced ${tokenName}'s '${poisonName}' to Stage ${newStage}`);
+
+            });
+
+        }
+
+    } catch (err) {
+        log("advancePoison: Error: " + err.message);
+        sendChat("gmtools.js", "advancePoison: Error: " + err.message);
     }
 }
 
@@ -2173,9 +2324,19 @@ on('ready', async function () {
                 }
             }
 
-            // Add Poison (GM Only, called internally)
+            // Add Poison (GM Only, called with macro)
             if ((msg.content.match(/^!poison\sadd/i)) && (typeof msg.selected != 'undefined') && (playerIsGM(msg.playerid))) {
                 addPoison(msg.selected, msg.content);
+            }
+
+            // Remove Poison (GM Only, called with button)
+            if ((msg.content.match(/^!poison\sremove/i)) && (playerIsGM(msg.playerid))) {
+                removePoison(msg.content);
+            }
+
+            // Advance Poison (GM Only, called with button)
+            if ((msg.content.match(/^!poison\sadvance/i)) && (playerIsGM(msg.playerid))) {
+                advancePoison(msg.content);
             }
 
             // Show Exploration Activity Menu (Player-accessible, called with macro)
