@@ -394,6 +394,13 @@ async function resetGMMacros(gm_id) {
                 istokenaction: true
             },
             {
+                name: "Poison-Add",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!poison add ?{Poison Name?}',
+                istokenaction: true
+            },
+            {
                 name: "Exploration",
                 _playerid: gm_id,
                 visibleto: gm_id,
@@ -1509,6 +1516,72 @@ async function showConditions(selectedToken) {
     }
 }
 
+/* Function to add a poison to a token
+This is a lot simpler than Conditions because we don't have to do much validation, and don't need additional queries
+We're just adding [poison:name stage:1] to the gmnotes, and showCondition will do the rest
+*/
+async function addPoison(selectedTokens, msg) {
+    try {
+        // Parse argument from string
+        const regex = /^\!poison\sadd\s(.*)$/i;
+        const matches = msg.match(regex);
+        if (!matches) {
+            sendChat("gmtools.js", "addPoison: Error: Message does not match expected pattern.");
+            log("gmtools.js: addPoison: Error: Message does not match expected pattern.");
+            return;
+        } else {
+            var poisonName = matches[1];
+
+            // Loop through tokens
+            await Promise.all(selectedTokens.map(async (selectedToken) => {
+                // Get token properties
+                const tokenId = selectedToken._id;
+                const tokenObj = await getObj('graphic', tokenId);
+                const tokenName = await tokenObj.get('name');
+                const currentGmNotes = await tokenObj.get('gmnotes');  // ex:  [condition:Slowed value:1] [poison:Arsenic stage:1]
+
+                // Check if poison is already there
+                const rgx = new RegExp(`\\[poison\\:${poisonName}`, "i");
+                if (currentGmNotes.match(rgx)) {
+                    // It's there - check if it's the same stage
+
+                    // TBD
+
+                } else {
+                    // It's not there - add new poison to the gm notes
+                    var newGmNotes = currentGmNotes + ` [poison:${poisonName} stage:1]`;
+                    await tokenObj.set('gmnotes', newGmNotes);
+
+                    // And add status marker IF status marker is not already present
+                    // For some reason, adding custom imported statusmarker uses convention "6042737:clumsy", but removing uses "clumsy::6042737"
+                    // This seems like a bug. In case it gets fixed in the future, we will account for both conventions
+                    const statusA = conditions["Persistent_Poison"].statusMarker;
+                    const parts = statusA.split(":");
+                    const statusB = parts[1] + "::" + parts[0];
+                    const hasStatusA = await tokenObj.get(`status_${statusA}`);
+                    const hasStatusB = await tokenObj.get(`status_${statusB}`);
+                    if (!(hasStatusA || hasStatusB)) {
+                        tokenObj.set(`status_${conditions["Persistent_Poison"].statusMarker}`, true);
+                    }
+
+                    // And announce that we have added the poison
+                    sendChat("gmtools.js", `/desc ${poisonName} applied to ${tokenName}.`)
+
+                }
+
+
+            }));
+
+        }
+
+
+
+    } catch (err) {
+        log("addPoison: Error: " + err.message);
+        sendChat("gmtools.js", "addPoison: Error: " + err.message);
+    }
+}
+
 /* Function to display the Exploration Activity options to a player
 Buttons in the table allow the player to choose which Activity they want their character to assume
       [CHOOSE](!exploration choose <playerId> <speakingas> <activityName>)
@@ -2098,6 +2171,11 @@ on('ready', async function () {
                     log("gmtools.js: Show Conditions only works for a single token.");
                     sendChat("gmtools.js", "Show Conditions only works for a single token.");
                 }
+            }
+
+            // Add Poison (GM Only, called internally)
+            if ((msg.content.match(/^!poison\sadd/i)) && (typeof msg.selected != 'undefined') && (playerIsGM(msg.playerid))) {
+                addPoison(msg.selected, msg.content);
             }
 
             // Show Exploration Activity Menu (Player-accessible, called with macro)
