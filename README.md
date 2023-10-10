@@ -33,6 +33,9 @@ Add a condition ("Slowed", "Paralyzed", etc.) to one or more selected tokens. Th
 ### Conditions-Show (Macro - Token Action)
 Display a table of all of the conditions affecting a single token. For each condition, a button is also provided to remove it.
 
+### Poison-Add (Macro - Token Action)
+Add a poison to one or more selected tokens. This puts an appropriate status marker on the token (requires import of custom status markers) and also stores the full status data in the token's GM notes. This includes a Stage number for the poison, which can be advanced with a button in the "Conditions-Show" display table.
+
 ### Exploration Activities (Macros for player and GM)
 Players can use the command "!exploration" to change what Exploration Activity their character is performing. The GM can use the command "!exploration display" to show a summary of the party's exploration activities in the chat. Both of these can be macros.
 
