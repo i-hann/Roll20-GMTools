@@ -1548,11 +1548,17 @@ async function showConditions(selectedToken) {
                 "width": "15%"
             });
 
-            // Second Row: Stage #, followed by Advance button
+            // Second Row:   [-2] [-1] Stage # [+1] [+2]
             var secondRow = [];
             var stage = poisonObj.Stage;
-            const advanceButton = `[ADVANCE](!poison advance Name@${poisonObj.Name} Stage@${poisonObj.Stage} tokenIds@${selectedToken._id})`;
-            var stageString = `Stage ${stage}   ${advanceButton}`;
+            const plusOneButton = `[+1](!poison advance Name@${poisonObj.Name} Stage@${poisonObj.Stage} Value@1 tokenIds@${selectedToken._id})`;
+            const plusTwoButton = `[+2](!poison advance Name@${poisonObj.Name} Stage@${poisonObj.Stage} Value@2 tokenIds@${selectedToken._id})`;
+            const minusOneButton = `[-1](!poison regress Name@${poisonObj.Name} Stage@${poisonObj.Stage} Value@1 tokenIds@${selectedToken._id})`;
+            const minusTwoButton = `[-2](!poison regress Name@${poisonObj.Name} Stage@${poisonObj.Stage} Value@2 tokenIds@${selectedToken._id})`;
+
+
+
+            var stageString = `${minusTwoButton}   ${minusOneButton}   <b>Stage ${stage}</b>   ${plusOneButton}   ${plusTwoButton}`;
 
             secondRow.push({
                 "string": stageString,
@@ -1690,19 +1696,21 @@ async function removePoison(arg) {
 async function advancePoison(arg) {
     try {
         // Parse argument string
-        const regexp = /^!poison\s*advance\s*Name\@(.*?)\s*Stage@([0-9]*?)\s*tokenIds\@(.*?)\s*$/i;
+        const regexp = /^!poison\s*advance\s*Name\@(.*?)\s*Stage@([0-9]*?)\s*Value@([0-9])\s*tokenIds\@(.*?)\s*$/i;
         const matches = arg.match(regexp);
         if (matches) {
             // Map arg data
             const poisonName = matches[1];
             const oldStage = matches[2];
-            const tokenIdsString = matches[3];
+            const addValue = matches[3];
+            const tokenIdsString = matches[4];
 
             const tokenIds = tokenIdsString.split('@');
 
             // Calc new stage
             var oldStageNumber = await parseInt(oldStage);
-            var newStage = oldStageNumber + 1;
+            var addNumber = await parseInt(addValue);
+            var newStage = oldStageNumber + addNumber;
 
             // Loop through tokens
             _.each(tokenIds, async (tokenId) => {
@@ -1722,6 +1730,64 @@ async function advancePoison(arg) {
                 // Log the advance
                 log(`gmtools.js: advancePoison: Advanced ${poisonName} on ${tokenName} to Stage ${newStage}`);
                 sendChat("gmtools.js", `Advanced ${tokenName}'s '${poisonName}' to Stage ${newStage}`);
+
+            });
+
+        }
+
+    } catch (err) {
+        log("advancePoison: Error: " + err.message);
+        sendChat("gmtools.js", "advancePoison: Error: " + err.message);
+    }
+}
+
+async function regressPoison(arg) {
+    try {
+        // Parse argument string
+        const regexp = /^!poison\s*regress\s*Name\@(.*?)\s*Stage@([0-9]*?)\s*Value@([0-9])\s*tokenIds\@(.*?)\s*$/i;
+        const matches = arg.match(regexp);
+        if (matches) {
+            // Map arg data
+            const poisonName = matches[1];
+            const oldStage = matches[2];
+            const subtractValue = matches[3];
+            const tokenIdsString = matches[4];
+
+            const tokenIds = tokenIdsString.split('@');
+
+            // Calc new stage
+            var oldStageNumber = await parseInt(oldStage);
+            var subtractNumber = await parseInt(subtractValue);
+            var newStage = oldStageNumber - subtractNumber;
+
+            // Loop through tokens
+            _.each(tokenIds, async (tokenId) => {
+                // Get token properties
+                const tokenObj = await getObj('graphic', tokenId);
+                const tokenName = await tokenObj.get('name');
+                const currentGmNotes = await tokenObj.get('gmnotes');  // ex:  [condition:Slowed value:1] [poison:Giant Centipede Venom stage:2]
+                
+                if (newStage <= 0) {
+                    // If new stage is <= 0, the poison should actually be removed.
+                    const removeArg = `!poison remove Name@${poisonName} tokenIds@${tokenId}`;
+                    sendChat("gmtools.js", `${tokenName}'s ${poisonName} regressed to Stage 0 or lower. Removing the poison.`);
+                    removePoison(removeArg);
+                } else {
+                    // Else decrease stage #
+                    // Create new data
+                    const newPoison = `[poison:${poisonName} stage:${newStage}]`
+
+                    // Replace old poison data with new poison data
+                    const rgx = new RegExp(`\\[poison\\:${poisonName}\\sstage\\:${oldStage}\\]`, "i");
+                    var newGmNotes = currentGmNotes.replace(rgx, newPoison);
+                    await tokenObj.set('gmnotes', newGmNotes);
+
+                    // Log the regress
+                    log(`gmtools.js: regressPoison: Regressed ${poisonName} on ${tokenName} to Stage ${newStage}`);
+                    sendChat("gmtools.js", `Regressed ${tokenName}'s '${poisonName}' to Stage ${newStage}`);
+                }
+
+
 
             });
 
@@ -2337,6 +2403,11 @@ on('ready', async function () {
             // Advance Poison (GM Only, called with button)
             if ((msg.content.match(/^!poison\sadvance/i)) && (playerIsGM(msg.playerid))) {
                 advancePoison(msg.content);
+            }
+
+            // Regress Poison (GM Only, called with button)
+            if ((msg.content.match(/^!poison\sregress/i)) && (playerIsGM(msg.playerid))) {
+                regressPoison(msg.content);
             }
 
             // Show Exploration Activity Menu (Player-accessible, called with macro)
