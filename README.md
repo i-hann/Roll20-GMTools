@@ -21,6 +21,9 @@ Rolls Saving Throws for the selected token(s). Tokens with the same image are as
 ### Image-Cycle (Macro - Token Action)
 After creating a Rollable Table in Roll20 with multiple images for a token, the Cycle button will increment the token's image by one table item each time (i.e. 1 -> 2 -> 3 -> 1)
 
+### Sound Effect Macro Support
+Sound effects uploaded and categorized with the title convention "Category: ..." can be randomly played using a macro with the command "!sfx [Category]". For example, You could have sound effects titled "Fireball: 1", "Fireball: 2", and "Fireball: 3". A macro with the command "!sfx fireball" would play one of those effects at random.
+
 ### Death Sound Effects
 Treating Bar 3 as HP, any token that drops to 0 HP or lower will trigger a Death sound effect from the Roll20 Jukebox. In order for a Jukebox item to be used as a Death sound effect, it's title needs to begin with "Death:" (ex: "Death: Wilhelm Scream").
 

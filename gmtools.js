@@ -369,7 +369,7 @@ async function resetGMMacros(gm_id) {
                 name: "Refresh-Sfx",
                 _playerid: gm_id,
                 visibleto: gm_id,
-                action: '!refresh deathsfx',
+                action: '!refresh sfx',
                 istokenaction: false
             },
             {
@@ -713,6 +713,36 @@ async function loadDeathSfxPlaylist() {
     })
 }
 
+// Function to populate the allSfx Playlist from the Roll20 Jukebox
+async function loadAllSfxPlaylist() {
+    return new Promise(async (resolve, reject) => {
+        try {
+            // Get all Sfx
+            const allSfx = await findObjs({
+                _type: "jukeboxtrack"
+            });
+
+            // Populate all sfx into array
+            var allSfxPlaylist = [];
+            const promises = allSfx.map(async (obj) => {
+                allSfxPlaylist.push(obj);
+            });
+            await Promise.all(promises);
+
+            // Resolve
+            if (allSfxPlaylist.length > 0) {
+                resolve(allSfxPlaylist);
+            } else {
+                reject("allSfxPlaylist resolved as empty.");
+            }
+
+        } catch (err) {
+            log("gmtools.js: loadAllSfxPlaylist: Error: " + err.message);
+            reject(err.message);
+        }
+    })
+}
+
 // Function to play a random Death Sfx
 async function playRandomDeathSfx(deathSfxPlaylist) {
     try {
@@ -724,6 +754,58 @@ async function playRandomDeathSfx(deathSfxPlaylist) {
         jukeboxObj.set("playing", false);
         jukeboxObj.set("softstop", false);
         jukeboxObj.set("playing", true);
+
+    } catch (err) {
+        log("gmtools.js: Error in playDeathSfx: " + err.message);
+        sendChat("gmtools.js", "Error in playDeathSfx: " + err.message);
+    }
+}
+
+// Function to play a random matching sfx
+async function playRandomMatchingSfx(allSfxPlaylist, msg) {
+    try {
+
+        // Extract arg
+        const argMatches = msg.match(/^!sfx\s*(.*?)\s*$/i);
+        if (argMatches) {
+            const arg = argMatches[1];
+
+            // Convert arg to regex
+            const rgx = new RegExp(`^.*?${arg}.*?:`, "i");
+
+            // Create array of sfx that match the arg
+            var matchingSfx = [];
+            const promises = allSfxPlaylist.map(async (sfx) => {
+
+                const sfxTitle = await sfx.get('title');
+
+                if (rgx.test(sfxTitle)) {
+                    matchingSfx.push(sfx);
+                }
+
+            });
+            await Promise.all(promises);
+
+            // Confirm there was a match
+            if (matchingSfx.length > 0) {
+
+                // Get random obj from playlist
+                const randomIndex = await randomInteger(matchingSfx.length - 1);
+                const jukeboxObj = matchingSfx[randomIndex];
+
+                // Play it
+                jukeboxObj.set("playing", false);
+                jukeboxObj.set("softstop", false);
+                jukeboxObj.set("playing", true);
+
+            } else {
+                log("gmtools.js: playRandomMatchingSfx: Could not find sfx matching '" + msg + "'.");
+                sendChat("gmtools.js", "Could not find sfx matching '" + msg + "'.");
+            }
+        } else {
+            log("gmtools.js: playRandomMatchingSfx: Error: argument did not match expected pattern of '!sfx <arg>'. Arg = '" + msg + "'.");
+            sendChat("gmtools.js", "playRandomMatchingSfx: Error: argument did not match expected pattern of '!sfx <arg>'. Arg = '" + msg + "'.");
+        }
 
     } catch (err) {
         log("gmtools.js: Error in playDeathSfx: " + err.message);
@@ -2286,10 +2368,13 @@ on('ready', async function () {
         "#ffde00", "#ffe500", "#ffed00", "#fff500", "#fffc00"
     ]
 
-    // Load DeathSfx Playlist
+    // Load sfx playlists
     var deathSfxPlaylist = await loadDeathSfxPlaylist().catch((err) => {
         log("gmtools.js: Failed to load DeathSfxPlaylist.");
     });
+    var allSfxPlaylist = await loadAllSfxPlaylist().catch((err) => {
+        log("gmtools.js: Failed to load allSfxPlaylist.")
+    })
 
     // Ready Msg
     log("gmtools.js: Ready!");
@@ -2313,9 +2398,15 @@ on('ready', async function () {
                 handleDebug(msg.selected[0]);
             }
 
-            // Refresh Death Sfx Playlist (GM Only)
-            if ((msg.content.match(/^!refresh deathsfx$/i)) && (playerIsGM(msg.playerid))) {
+            // Refresh Sfx Playlists (GM Only)
+            if ((msg.content.match(/^!refresh sfx$/i)) && (playerIsGM(msg.playerid))) {
                 deathSfxPlaylist = await loadDeathSfxPlaylist();
+                allSfxPlaylist = await loadAllSfxPlaylist();
+            }
+
+            // Play Matching Sfx
+            if ((msg.content.match(/!sfx\s*\S+/i))) {
+                playRandomMatchingSfx(allSfxPlaylist, msg.content);
             }
 
             // Group Initiative (GM Only)
