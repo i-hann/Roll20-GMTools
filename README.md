@@ -44,3 +44,6 @@ Players can use the command "!exploration" to change what Exploration Activity t
 
 ### Tension Pool
 The Tension Pool is a system-agnostic supplement for any tabletop rpg where you want your players to care more about the time they're wasting within a dungeon. The "Tension" macro displays the current Tension, with buttons for Reckless Behavior, Time Consumption, and Clear. To read more about how the Tension Pool works, you can go here: https://theangrygm.com/definitive-tension-pool/
+
+### Hypotenuse Calculator
+You can use the "Hypotenuse" macro to calculate the diagonal distance (hypotenuse) from one creature to another, given their relative difference in horizontal and vertical coordinates. This is useful for gauging how far away creatures are from each other during underwater or aerial combat.

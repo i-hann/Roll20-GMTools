@@ -1,6 +1,6 @@
 
 
-// Tension imgsrc
+// imgsrc
 const tension_imgsrc = "https://s3.amazonaws.com/files.d20.io/images/354795605/aLymHd04vGUnZ-0FpMtC2Q/max.png?1692124399";
 
 // Exploration Activities
@@ -412,6 +412,13 @@ async function resetGMMacros(gm_id) {
                 _playerid: gm_id,
                 visibleto: gm_id,
                 action: '!tension show',
+                istokenaction: false
+            },
+            {
+                name: "Hypotenuse",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!hypot ?{Horizontal Distance?} ?{Vertical Distance?}',
                 istokenaction: false
             }
 
@@ -2354,6 +2361,71 @@ async function tensionClear() {
     }
 }
 
+async function calculateHypotenuse(h, v) {
+    try {
+        // Calculate
+        var hInt = await parseInt(h);
+        var vInt = await parseInt(v);
+        var hypot = await Math.hypot(hInt, vInt);
+        hypot = await Math.floor(hypot);
+
+        // Build HTML Table
+
+        // Build display table
+        var tableData = {
+            style: "width:100%; border: 1px solid black",
+            headers: [
+                {
+                    name: `Hypotenuse = ${hypot}`,
+                    style: "background-color:black; color:white; padding:8px; font-size:30px",
+                    align: "center",
+                    colspan: "2"
+                }
+            ],
+            columns: [],
+            rows: []
+        };
+
+        var firstRow = [];
+        firstRow.push({
+            "string": "Horizontal",
+            "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:20px",
+            "colspan": "1",
+            "width": "100%"
+        });
+        firstRow.push({
+            "string": hInt,
+            "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:20px",
+            "colspan": "1",
+            "width": "100%"
+        });
+        (tableData.rows).push(firstRow);
+
+        var secondRow = [];
+        secondRow.push({
+            "string": "Vertical",
+            "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:20px",
+            "colspan": "1",
+            "width": "100%"
+        });
+        secondRow.push({
+            "string": vInt,
+            "style": "padding:5px; text-align: center; border-bottom: 1px solid black; font-size:20px",
+            "colspan": "1",
+            "width": "100%"
+        });
+        (tableData.rows).push(secondRow);
+
+        const table = await HTMLBuilder(tableData, true);
+
+        sendChat("gmtools.js", table);
+
+    } catch (err) {
+        log("calculateHypotenuse: Error: " + err.message);
+        sendChat("gmtools.js", "calculateHypotenuse: Error: " + err.message);
+    }
+}
+
 
 on('ready', async function () {
     "use strict";
@@ -2544,6 +2616,18 @@ on('ready', async function () {
                 tensionClear();
             }
 
+            // Hypotenuse Calculator
+            if ((msg.content.match(/^!hypot/i)) && (playerIsGM(msg.playerid))) {
+                var hypotRegex = /!hypot\s([0-9]*)\s([0-9]*)/;
+                var hypotMatches = msg.content.match(hypotRegex);
+                if (hypotMatches) {
+                    calculateHypotenuse(hypotMatches[1], hypotMatches[2]);
+                } else {
+                    sendChat("gmtools.js", "Error: Unexpected arguments for Hypotenuse calculation.");
+                    log("Error: Unexpected arguments for Hypotenuse calculation.");
+                }
+            }
+
         } catch (err) {
             log("Error: " + err.message);
             sendChat("gmtools.js", "Error: " + err.message);
@@ -2564,8 +2648,5 @@ on('ready', async function () {
             log("gmtools.js: Error in main: HP Event Listener: " + err.message);
             sendChat("gmtools.js", "Error in main: HP Event Listener: " + err.message)
         }
-
     });
-
-
 });
