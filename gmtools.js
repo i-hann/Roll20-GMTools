@@ -7,11 +7,15 @@ const tension_imgsrc = "https://s3.amazonaws.com/files.d20.io/images/354795605/a
 const exploration_activities = [
     {
         "Name": "Avoid Notice",
-        "Description": "Repeatedly roll Stealth to determine if enemies notice you. Use Stealth for Initiative in the next encounter."
+        "Description": "Move with Stealth."
     },
     {
         "Name": "Defend",
-        "Description": "At the start of the next encounter, your shield is already raised (as 'Raise Shield' action)."
+        "Description": "Keep your shield raised."
+    },
+    {
+        "Name": "Detect Magic",
+        "Description": "Cast Detect Magic at regular intervals. You have no chance of accidentally overlooking a magic aura."
     },
     {
         "Name": "Follow the Expert",
@@ -19,19 +23,27 @@ const exploration_activities = [
     },
     {
         "Name": "Investigate",
-        "Description": "Use Recall Knowledge to discover clues among the various things you see and engage with."
+        "Description": "Use Recall Knowledge to ask questions about your surroundings. This can reveal details about the previous or next encounters."
     },
     {
-        "Name": "Repeat a Spell",
-        "Description": "Repeatedly cast the same spell (2 actions or fewer)."
+        "Name": "Repair",
+        "Description": "With a repair kit and the Crafting skill, you fix a damaged item."
     },
     {
-        "Name": "Scout",
-        "Description": "At the start of the next encounter, your party gains +1 to initiative."
+        "Name": "Repeat or Sustain a Spell",
+        "Description": "Repeat a Cantrip, or sustain a spell with sustained duration."
+    },
+    {
+        "Name": "Stay Vigilant",
+        "Description": "Keep an eye out for an attack from any direction. The party gains +1 to initiative."
     },
     {
         "Name": "Search",
-        "Description": "Repeatedly roll Perception to spot hidden doors, traps, and hazards."
+        "Description": "Roll Perception to meticulously examine your surroundings."
+    },
+    {
+        "Name": "Track",
+        "Description": "Use Survival to find and follow creatures’ tracks."
     },
     {
         "Name": "Treat Wounds",
