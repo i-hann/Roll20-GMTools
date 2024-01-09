@@ -3,6 +3,9 @@
 // imgsrc
 const tension_imgsrc = "https://s3.amazonaws.com/files.d20.io/images/354795605/aLymHd04vGUnZ-0FpMtC2Q/max.png?1692124399";
 
+// Torch icon
+const torch_status_marker = "Torch::6509496";
+
 // Exploration Activities
 const exploration_activities = [
     {
@@ -432,6 +435,20 @@ async function resetGMMacros(gm_id) {
                 visibleto: gm_id,
                 action: '!hypot ?{Horizontal Distance?} ?{Vertical Distance?}',
                 istokenaction: false
+            },
+            {
+                name: "Torch-Add",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!torch add',
+                istokenaction: true
+            },
+            {
+                name: "Torch-Remove",
+                _playerid: gm_id,
+                visibleto: gm_id,
+                action: '!torch remove',
+                istokenaction: true
             }
 
         ];
@@ -2438,6 +2455,62 @@ async function calculateHypotenuse(h, v) {
     }
 }
 
+async function torchAdd(selectedTokens) {
+    _.each(selectedTokens, async (token) => {
+        try {
+            // Get token obj
+            var tokenObj = await getObj('graphic', token._id);
+
+            // Get character name
+            var name = await tokenObj.get('name');
+
+            // Set lighting
+            await tokenObj.set('has_bright_light_vision', true);
+            await tokenObj.set('emits_bright_light', true);
+            await tokenObj.set('bright_light_distance', 20);
+            await tokenObj.set('emits_low_light', true);
+            await tokenObj.set('low_light_distance', 40);
+
+            // Set icon
+            tokenObj.set(`status_${torch_status_marker}`, true);
+
+            // Log it
+            sendChat("gmtools.js", "Added Torch effect to " + name);
+            
+        } catch (err) {
+            log("torchAdd: Error: " + err.message);
+            sendChat("gmtools.js", "torchAdd: Error: " + err.message);
+        }
+    });
+}
+
+async function torchRemove(selectedTokens) {
+    _.each(selectedTokens, async (token) => {
+        try {
+            // Get token obj
+            var tokenObj = await getObj('graphic', token._id);
+
+            // Get character name
+            var name = await tokenObj.get('name');
+
+            // Set lighting
+            await tokenObj.set('emits_bright_light', false);
+            await tokenObj.set('emits_low_light', false);
+
+            // Remove icon
+            tokenObj.set(`status_${torch_status_marker}`, false);
+
+            // Log it
+            sendChat("gmtools.js", "Removed Torch from " + name);
+
+        } catch (err) {
+            log("torchRemove: Error: " + err.message);
+            sendChat("gmtools.js", "torchRemove: Error: " + err.message);
+        }
+    });
+
+}
+
 
 on('ready', async function () {
     "use strict";
@@ -2637,6 +2710,19 @@ on('ready', async function () {
                 } else {
                     sendChat("gmtools.js", "Error: Unexpected arguments for Hypotenuse calculation.");
                     log("Error: Unexpected arguments for Hypotenuse calculation.");
+                }
+            }
+
+            // Add Torch
+            if ((msg.content.match(/^!torch/i)) && (playerIsGM(msg.playerid))) {
+                var torchAddRegex = /!torch\sadd/;
+                var torchRemoveRegex = /!torch\sremove/;
+                var torchAddMatches = msg.content.match(torchAddRegex);
+                var torchRemoveMatches = msg.content.match(torchRemoveRegex);
+                if (torchAddMatches) {
+                    torchAdd(msg.selected);
+                } else if (torchRemoveMatches) {
+                    torchRemove(msg.selected);
                 }
             }
 

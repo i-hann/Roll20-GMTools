@@ -47,3 +47,6 @@ The Tension Pool is a system-agnostic supplement for any tabletop rpg where you 
 
 ### Hypotenuse Calculator
 You can use the "Hypotenuse" macro to calculate the diagonal distance (hypotenuse) from one creature to another, given their relative difference in horizontal and vertical coordinates. This is useful for gauging how far away creatures are from each other during underwater or aerial combat.
+
+### Torch Toggle
+You can use the "Torch-Add" and "Torch-Remove" macros to easily add/remove Torch or Light effects from a token. This makes Dynamic Lighting less of a hassle.
